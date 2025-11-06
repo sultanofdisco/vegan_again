@@ -46,8 +46,6 @@ def try_scroll_load(driver, attempts=10, delay=0.5):
         last_height = new_height
     print("스크롤 완료.")
 
-
-
 def search_place_and_get_menu(place_name):
     """(메뉴가 없을 때 호출) 메뉴와 이미지를 모두 크롤링합니다."""
     chrome_options = Options()
@@ -291,7 +289,6 @@ def search_place_and_get_menu(place_name):
         if 'driver' in locals():
             driver.quit()
 
-
 def search_place_and_get_first_image(place_name):
     chrome_options = Options()
     #chrome_options.add_argument("--headless=new")
@@ -370,7 +367,7 @@ def search_place_and_get_first_image(place_name):
         if 'driver' in locals():
             driver.quit()
 
-def main():
+def get_all_restaurants():
     # ===== Supabase 연결 =====
     url: str = os.environ.get("SUPABASE_URL")
     key: str = os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
@@ -483,4 +480,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    get_all_restaurants()
