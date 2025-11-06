@@ -1,4 +1,5 @@
 import re
+import html
 from app.config import supabase
 
 
@@ -10,13 +11,13 @@ def validate_string_type(value, field_name):
 
 
 def sanitize_input(value, max_length=None):
-    """입력 값 sanitization (앞뒤 공백 제거, 길이 제한)"""
+    """입력 값 sanitization (앞뒤 공백 제거, 길이 제한, HTML 이스케이프)"""
     if not isinstance(value, str):
         return None
     sanitized = value.strip()
     if max_length and len(sanitized) > max_length:
         sanitized = sanitized[:max_length]
-    return sanitized
+    return html.escape(sanitized)
 
 
 def validate_email(email):

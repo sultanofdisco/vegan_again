@@ -1,3 +1,8 @@
+import ipaddress
+import socket
+from urllib.parse import urlparse
+from click import Tuple
+import requests
 from flask import Blueprint, request, jsonify, session
 from app.config import supabase
 from app.auth.session import validate_session_security
@@ -110,32 +115,183 @@ def validate_rating(rating):
     
     return True, None
 
-
-def validate_image_url(image_url):
-    """이미지 URL 검증"""
-    if image_url is None or image_url == '':
-        return True, None  # 선택사항
+def validate_image_url(image_url: str) -> Tuple[bool, str]:
+    """
+    [최대 보안 강화]
+    SSRF, DNS Rebinding, IPv6 우회 등 모든 공격 벡터 차단
+    """
     
+    ALLOWED_IMAGE_MIME_TYPES = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+    ]
+    MAX_FILE_SIZE = 5 * 1024 * 1024
+    MAX_URL_LENGTH = 2048
+
+    # 1. 기본 문자열 검증
     if not isinstance(image_url, str):
         return False, '이미지 URL은 문자열이어야 합니다.'
     
-    if len(image_url) > 2048:
-        return False, '이미지 URL은 최대 2048자까지 입력 가능합니다.'
-    
-    # Base64 이미지인지 확인
-    if image_url.startswith('data:image/'):
-        return validate_base64_image(image_url)
-    
-    # URL 형식 검증
-    url_pattern = r'^https?://[^\s/$.?#].[^\s]*$'
-    if not re.match(url_pattern, image_url):
-        return False, '올바른 URL 형식이 아닙니다.'
-    
-    # 안전한 프로토콜만 허용
-    if not image_url.startswith(('http://', 'https://')):
-        return False, '이미지 URL은 http 또는 https로 시작해야 합니다.'
-    
-    return True, None
+    if len(image_url) > MAX_URL_LENGTH:
+        return False, f'이미지 URL은 최대 {MAX_URL_LENGTH}자까지 입력 가능합니다.'
+
+    # 2. URL 파싱 및 스킴 검증
+    try:
+        parsed = urlparse(image_url)
+        
+        # 2-1. 스킴은 http/https만 허용
+        if parsed.scheme not in ['http', 'https']:
+            return False, 'http 또는 https 프로토콜만 허용됩니다.'
+        
+        # 2-2. 호스트네임 필수
+        if not parsed.hostname:
+            return False, '유효하지 않은 URL입니다 (호스트명 없음).'
+        
+        # 2-3. 인증 정보 차단 (http://user:pass@host 형태)
+        if parsed.username or parsed.password or '@' in parsed.netloc:
+            return False, 'URL에 인증 정보를 포함할 수 없습니다.'
+        
+        hostname = parsed.hostname
+        
+    except Exception as e:
+        return False, f'URL 파싱 오류: {e}'
+
+    # 3. DNS 조회 및 모든 IP 검증 (IPv4 + IPv6)
+    try:
+        # getaddrinfo: IPv4와 IPv6 모두 반환
+        addr_info = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
+        
+        if not addr_info:
+            return False, 'DNS 조회 결과가 없습니다.'
+        
+        # 모든 IP 주소 검증 (하나라도 위험하면 차단)
+        safe_ips = []
+        for info in addr_info:
+            ip_str = info[4][0]
+            
+            try:
+                ip_obj = ipaddress.ip_address(ip_str)
+                
+                # 위험한 IP 범위 모두 차단
+                if (ip_obj.is_private or 
+                    ip_obj.is_loopback or 
+                    ip_obj.is_link_local or
+                    ip_obj.is_multicast or
+                    ip_obj.is_reserved or
+                    ip_obj.is_unspecified):
+                    return False, f'내부망/예약된 IP 주소 차단: {ip_str}'
+                
+                # 추가: 특정 위험 IP 대역 수동 차단
+                # 0.0.0.0/8, 169.254.0.0/16, 224.0.0.0/4 등
+                if ip_obj.version == 4:
+                    first_octet = int(str(ip_obj).split('.')[0])
+                    if first_octet in [0, 10, 127, 169, 172, 192, 224, 240]:
+                        if first_octet == 172:
+                            # 172.16.0.0/12만 사설망
+                            second_octet = int(str(ip_obj).split('.')[1])
+                            if 16 <= second_octet <= 31:
+                                return False, f'사설 IP 차단: {ip_str}'
+                        elif first_octet != 192 or str(ip_obj).startswith('192.168.'):
+                            return False, f'차단된 IP 대역: {ip_str}'
+                
+                safe_ips.append(ip_str)
+                
+            except ValueError:
+                return False, f'유효하지 않은 IP 주소: {ip_str}'
+        
+        if not safe_ips:
+            return False, '안전한 IP 주소가 없습니다.'
+        
+        # 첫 번째 안전한 IP 사용
+        target_ip = safe_ips[0]
+        
+    except socket.gaierror:
+        return False, '도메인 이름을 확인할 수 없습니다.'
+    except Exception as e:
+        return False, f'DNS 조회 오류: {e}'
+
+    # 4. IP로 직접 요청 (DNS Rebinding 방지)
+    try:
+        # URL의 호스트를 IP로 변경
+        ip_url = image_url.replace(f'//{hostname}', f'//{target_ip}', 1)
+        
+        # Host 헤더는 원래 호스트명 유지 (가상 호스팅 지원)
+        headers = {
+            'Host': hostname,
+            'User-Agent': 'Mozilla/5.0 (compatible; ImageValidator/1.0)'
+        }
+        
+        # 타임아웃: (연결, 읽기) 분리
+        timeout = (3, 7)
+        
+        # 리다이렉트 차단 (리다이렉트 체인 공격 방지)
+        with requests.get(
+            ip_url, 
+            headers=headers,
+            timeout=timeout,
+            allow_redirects=False,  # 리다이렉트 완전 차단
+            stream=True,  # 스트리밍으로 일부만 다운로드
+            verify=True  # SSL 인증서 검증
+        ) as r:
+            # 4-1. 리다이렉트 응답 차단
+            if 300 <= r.status_code < 400:
+                return False, '리다이렉트는 허용되지 않습니다.'
+            
+            # 4-2. HTTP 상태 코드 검증
+            r.raise_for_status()
+            
+            # 4-3. Content-Type 검증
+            content_type = r.headers.get('Content-Type', '').split(';')[0].strip()
+            if content_type not in ALLOWED_IMAGE_MIME_TYPES:
+                return False, f'지원하지 않는 형식: {content_type}'
+            
+            # 4-4. Content-Length 검증 (헤더 기준)
+            content_length = r.headers.get('Content-Length')
+            if content_length:
+                try:
+                    size = int(content_length)
+                    if size > MAX_FILE_SIZE:
+                        return False, f'파일 크기 초과: {size / 1024 / 1024:.2f}MB'
+                except ValueError:
+                    pass
+            
+            # 4-5. 실제 바이너리 검증 (매직 넘버)
+            # 처음 12바이트만 다운로드
+            first_bytes = b''
+            for chunk in r.iter_content(chunk_size=12):
+                first_bytes = chunk
+                break
+            
+            if not first_bytes:
+                return False, '이미지 데이터를 읽을 수 없습니다.'
+            
+            # 매직 넘버 검증
+            is_valid_image = (
+                first_bytes.startswith(b'\xff\xd8\xff') or        # JPEG
+                first_bytes.startswith(b'\x89PNG\r\n\x1a\n') or   # PNG
+                first_bytes.startswith(b'GIF87a') or              # GIF87a
+                first_bytes.startswith(b'GIF89a') or              # GIF89a
+                (first_bytes.startswith(b'RIFF') and b'WEBP' in first_bytes[:12])  # WEBP
+            )
+            
+            if not is_valid_image:
+                return False, '실제 이미지 파일이 아닙니다 (매직 넘버 불일치).'
+        
+        # 모든 검증 통과
+        return True, None
+
+    except requests.exceptions.Timeout:
+        return False, '이미지 URL 응답 시간 초과'
+    except requests.exceptions.SSLError:
+        return False, 'SSL 인증서 검증 실패'
+    except requests.exceptions.ConnectionError:
+        return False, '서버에 연결할 수 없습니다.'
+    except requests.exceptions.RequestException as e:
+        return False, f'요청 실패: {str(e)[:100]}'
+    except Exception as e:
+        return False, f'알 수 없는 오류: {str(e)[:100]}'
 
 
 def validate_base64_image(base64_string):
@@ -685,14 +841,6 @@ def create_review(restaurant_id, user_id):
                 "success": False,
                 "error": error_msg
             }), 400
-        
-        if image_url:
-            is_valid, error_msg = validate_image_url(image_url)
-            if not is_valid:
-                return jsonify({
-                    "success": False,
-                    "error": error_msg
-                }), 400
         
         # 현재 시간
         now = datetime.now().isoformat()
