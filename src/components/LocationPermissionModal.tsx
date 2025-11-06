@@ -13,7 +13,6 @@ function LocationPermissionModal({ isOpen, onAllow, onDeny }: LocationPermission
 
   useEffect(() => {
     if (isOpen) {
-      // 약간의 딜레이 후 모달 표시 (UX 개선)
       const timer = setTimeout(() => setShouldShow(true), 100);
       return () => clearTimeout(timer);
     } else {

@@ -177,7 +177,6 @@ export async function removeBookmarkById(bookmarkId: number): Promise<BookmarkRe
       };
     }
 
-    // bookmarkId로 restaurant_id 찾기
     const bookmarks = await getBookmarks();
     const bookmark = bookmarks.data.find(b => b.id === bookmarkId);
     

@@ -145,15 +145,12 @@
   align-items: center;
 }
 
-/* ⬅️➡️ 옆으로 뜨는 말풍선 (기본: 오른쪽) */
 .tooltip {
   position: absolute;
   top: 50%;
   left: calc(100% + 20px);
-  /* 이름 오른쪽으로 10px 떨어져 */
   transform: translateY(-50%) translateX(4px);
   width: 300px;
-  /* 폭 고정: 모양/정렬 안정 */
   background: #333;
   color: #fff;
   padding: 10px 14px;

@@ -49,7 +49,6 @@ const Header = () => {
     }
   };
 
-  // 검색 초기화
   const handleClearSearch = () => {
     setSearchText('');
     setInputValue('');
