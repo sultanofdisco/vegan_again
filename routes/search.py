@@ -30,14 +30,6 @@ def search_restaurants():
                 "error": "검색어는 최소 2글자 이상 입력해주세요."
             }), 400
 
-        # 카테고리 화이트리스트 검증
-        allowed_categories = ['한식', '양식', '중식', '일식', '카페', '분식', '기타', '']
-        if category not in allowed_categories:
-            return jsonify({
-                "success": False,
-                "error": "유효하지 않은 카테고리입니다."
-            }), 400
-
         query = supabase.table('restaurants').select('*')
 
         if keyword:
@@ -46,8 +38,26 @@ def search_restaurants():
                 f'address.ilike.%{keyword}%'
             )
 
+        # 카테고리 필터링 (다중 선택 지원)
         if category:
-            query = query.eq('category', category)
+            # 쉼표로 구분된 카테고리 처리 (예: "한식,일식")
+            categories = [c.strip() for c in category.split(',')]
+
+            # 화이트리스트 검증
+            allowed_categories = ['한식', '양식', '중식', '일식', '카페', '기타']
+            for cat in categories:
+                if cat not in allowed_categories:
+                    return jsonify({
+                        "success": False,
+                        "error": f"유효하지 않은 카테고리입니다: {cat}"
+                    }), 400
+
+            # 다중 카테고리 OR 조건
+            if len(categories) == 1:
+                query = query.eq('category', categories[0])
+            else:
+                # in_ 사용 (Supabase에서 IN 연산자)
+                query = query.in_('category', categories)
 
         # 결과 개수 제한 (DoS 방지)
         response = query.limit(100).execute()
@@ -59,7 +69,6 @@ def search_restaurants():
         }), 200
 
     except Exception as e:
-        # 보안: 상세 에러는 로그에만, 사용자에게는 일반 메시지
         logging.error(f"검색 중 오류 발생: {str(e)}")
         return jsonify({
             "success": False,
