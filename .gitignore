@@ -1,0 +1,30 @@
+# .gitignore
+# 이 파일에 적힌 것들은 Git에 올라가지 않음 (보안 중요!)
+
+# 환경변수 파일 (절대 올리면 안됨!)
+.env
+.env.local
+
+# Python 관련
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE 관련
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 운영체제 관련
+.DS_Store
+Thumbs.db
+
+# 로그 파일 (민감한 에러 정보 포함)
+*.log
+app.log
