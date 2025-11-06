@@ -1156,3 +1156,18 @@ AttributeError: 'SyncSelectRequestBuilder' object has no attribute 'or_'
 2025-11-07 05:23:37,450 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
 2025-11-07 05:23:37,699 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
 2025-11-07 05:23:37,951 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:24:50,239 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 05:24:50,240 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 05:24:50,241 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:24:51,405 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:24:51,411 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:24:55,869 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:24:55] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:24:56,085 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:24:56] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:25:50,901 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:25:50] "[35m[1mPOST /api/restaurants/70/reviews HTTP/1.1[0m" 201 -
+2025-11-07 05:25:55,939 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:25:55] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:25:56,201 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:25:56] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:25:56,508 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:25:56] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:25:56,742 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:25:56] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:25:56,846 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:25:56] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:25:57,479 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:25:57] "GET /api/users/reviews HTTP/1.1" 200 -
