@@ -1,0 +1,180 @@
+.container {
+  width: 100%;
+  height: auto;
+  /* 🚨 추가: 내용에 따라 높이 자동 조절 */
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+  /* 밝은 그린 그라데이션 */
+  padding: 40px 20px;
+  padding-bottom: 80px;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: 500;
+  color: #2e7d32;
+  font-family: 'HsJandari', 'Pretendard', sans-serif;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* 탭 네비게이션 */
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  background: white;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.15);
+  /* 그린 그림자 */
+}
+
+.tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 24px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #66bb6a;
+  /* 중간 그린 */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  background: #f1f8e9;
+  /* 밝은 그린 배경 */
+  color: #43a047;
+}
+
+.activeTab {
+  background: linear-gradient(135deg, #4CAF50 0%, #66bb6a 100%);
+  /* 그린 그라데이션 */
+  color: white;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.activeTab:hover {
+  background: linear-gradient(135deg, #45a049 0%, #5cb85f 100%);
+  color: white;
+}
+
+.tabIcon {
+  font-size: 20px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 8px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.activeTab .badge {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 탭 컨텐츠 */
+.tabContent {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.1);
+  /* 그린 그림자 */
+  min-height: 500px;
+  height: auto;
+  /* 🚨 수정: 높이를 내용에 맞게 설정 */
+  /* max-height: none; 제거 */
+  overflow-y: visible;
+  /* 🚨 수정: 부모 요소가 스크롤 되도록 visible 유지 (혹은 auto) */
+  border: 1px solid rgba(76, 175, 80, 0.1);
+  /* 얇은 그린 테두리 */
+}
+
+/* 로딩 */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  gap: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #c8e6c9;
+  /* 밝은 그린 */
+  border-top-color: #4CAF50;
+  /* 메인 그린 */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loadingContainer p {
+  color: #4CAF50;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* 에러 */
+.errorContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px);
+  font-size: 18px;
+  color: #d32f2f;
+  /* 에러는 레드 유지 */
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 10px;
+    padding-bottom: 60px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .tabs {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .tab {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  .tabContent {
+    padding: 20px 15px;
+  }
+}
