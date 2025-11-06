@@ -30,16 +30,19 @@ interface Restaurant {
 interface Bookmark {
   id: number;
   restaurant: Restaurant;
+  restaurant_id?: number; // 백엔드에서 직접 받을 수 있는 restaurant_id
   created_at: string;
 }
 
 interface Review {
   id: number;
-  restaurant: Restaurant;
-  rating: number;
+  restaurantId: number;
+  restaurantName: string;
   content: string;
-  image_url: string | null;
-  created_at: string;
+  rating: number;
+  images: string[];
+  createdAt: string;
+  updatedAt: string | null;
 }
 
 const MyPage = () => {
@@ -62,6 +65,50 @@ const MyPage = () => {
     
     fetchUserData();
   }, [user, navigate]);
+
+  // 북마크 목록 가져오기 함수 (재사용)
+  const fetchBookmarks = async (): Promise<Bookmark[]> => {
+    try {
+      const bookmarksResponse = await apiClient.get('/users/bookmarks');
+      if (bookmarksResponse.data.success && bookmarksResponse.data.data) {
+        console.log('백엔드 응답 원본:', bookmarksResponse.data.data);
+        
+        const formattedBookmarks = bookmarksResponse.data.data.map((item: any) => {
+          const restaurant = item.restaurants || item.restaurant;
+          const restaurantId = item.restaurant_id;
+          
+          // 디버깅: 데이터 구조 확인
+          if (!restaurantId) {
+            console.warn('restaurant_id가 없는 북마크:', item);
+          }
+          if (!restaurant) {
+            console.warn('restaurant 객체가 없는 북마크:', item);
+          }
+          if (restaurant && restaurant.id !== restaurantId) {
+            console.warn('restaurant_id 불일치:', {
+              item_id: item.id,
+              restaurant_id: restaurantId,
+              restaurant_object_id: restaurant.id
+            });
+          }
+          
+          return {
+            id: item.id,
+            restaurant: restaurant || null,
+            restaurant_id: restaurantId,
+            created_at: item.created_at,
+          };
+        }).filter((bookmark: any) => bookmark.restaurant_id && bookmark.restaurant);
+        
+        console.log('포맷된 북마크:', formattedBookmarks);
+        return formattedBookmarks;
+      }
+      return [];
+    } catch (error) {
+      console.error('북마크 로딩 실패:', error);
+      return [];
+    }
+  };
 
   const fetchUserData = async () => {
     if (!user) {
@@ -86,25 +133,52 @@ const MyPage = () => {
       }
 
       // 북마크 목록 가져오기
-      try {
-        const bookmarksResponse = await apiClient.get('/users/bookmarks');
-        if (bookmarksResponse.data.success && bookmarksResponse.data.data) {
-          // 백엔드 응답 형식에 맞게 변환
-          const formattedBookmarks = bookmarksResponse.data.data.map((item: any) => ({
-            id: item.id,
-            restaurant: item.restaurants || item.restaurant,
-            created_at: item.created_at,
-          }));
-          setBookmarks(formattedBookmarks);
-        }
-      } catch (bookmarksError) {
-        console.error('북마크 로딩 실패:', bookmarksError);
-        setBookmarks([]);
-      }
+      const formattedBookmarks = await fetchBookmarks();
+      console.log('포맷된 북마크:', formattedBookmarks);
+      setBookmarks(formattedBookmarks);
 
-      // 리뷰 목록 가져오기 (리뷰 API가 있다면)
-      // 현재는 빈 배열로 설정
-      setReviews([]);
+      // 리뷰 목록 가져오기
+      try {
+        const reviewsResponse = await apiClient.get('/users/reviews');
+        console.log('리뷰 API 응답 전체:', reviewsResponse.data);
+        
+        if (reviewsResponse.data.success && reviewsResponse.data.data) {
+          const reviewsData = reviewsResponse.data.data.reviews || [];
+          console.log('리뷰 데이터:', reviewsData);
+          
+          // 백엔드 응답 형식에 맞게 변환
+          const formattedReviews = reviewsData.map((item: any) => ({
+            id: item.id,
+            restaurantId: item.restaurantId,
+            restaurantName: item.restaurantName,
+            content: item.content,
+            rating: item.rating,
+            images: item.images || [],
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt || null,
+          }));
+          
+          console.log('포맷된 리뷰:', formattedReviews);
+          setReviews(formattedReviews);
+        } else {
+          console.warn('리뷰 응답 형식 오류:', reviewsResponse.data);
+          setReviews([]);
+        }
+      } catch (reviewsError: any) {
+        console.error('리뷰 로딩 오류:', reviewsError);
+        console.error('리뷰 에러 상세:', {
+          message: reviewsError.message,
+          response: reviewsError.response?.data,
+          status: reviewsError.response?.status
+        });
+        // 401 에러인 경우 (인증 실패) 로그인 페이지로 리다이렉트
+        if (reviewsError.response?.status === 401) {
+          alert('로그인이 필요합니다.');
+          navigate('/login');
+          return;
+        }
+        setReviews([]); // 오류 발생 시 빈 배열로 설정
+      }
 
     } catch (error) {
       console.error('데이터 로딩 실패:', error);
@@ -147,52 +221,167 @@ const MyPage = () => {
     }
   };
 
-  const handleRemoveBookmark = async (bookmarkId: number) => {
+  const handleRemoveBookmark = async (bookmarkId: number, restaurantId: number) => {
     if (!confirm('즐겨찾기를 해제하시겠습니까?')) return;
 
     try {
-      // bookmarkId로 restaurant_id 찾기
+      // bookmarkId로 북마크 찾기 (검증용)
       const bookmark = bookmarks.find(b => b.id === bookmarkId);
       if (!bookmark) {
+        console.error('북마크를 찾을 수 없습니다:', { bookmarkId, 현재북마크IDs: bookmarks.map(b => b.id) });
         alert('즐겨찾기를 찾을 수 없습니다.');
         return;
       }
 
-      await apiClient.delete(`/users/bookmarks/${bookmark.restaurant.id}`);
-      setBookmarks(prev => prev.filter(bookmark => bookmark.id !== bookmarkId));
-      alert('즐겨찾기가 해제되었습니다.');
-    } catch (error) {
+      // restaurant_id 검증
+      const bookmarkRestaurantId = bookmark.restaurant_id || bookmark.restaurant?.id;
+      if (bookmarkRestaurantId !== restaurantId) {
+        console.error('restaurant_id 불일치:', {
+          전달된restaurantId: restaurantId,
+          북마크의restaurantId: bookmarkRestaurantId,
+          bookmark
+        });
+        alert('북마크 데이터가 일치하지 않습니다. 페이지를 새로고침해주세요.');
+        return;
+      }
+
+      console.log('북마크 삭제 시도:', { 
+        bookmarkId, 
+        restaurantId, 
+        bookmarkName: bookmark.restaurant?.name,
+        restaurantObjectId: bookmark.restaurant?.id
+      });
+
+      const response = await apiClient.delete(`/users/bookmarks/${restaurantId}`);
+      
+      if (response.data.success) {
+        // 삭제 성공 후 서버에서 최신 북마크 목록 다시 가져오기 (가장 안전한 방법)
+        try {
+          const updatedBookmarks = await fetchBookmarks();
+          console.log('삭제 후 새로고침된 북마크:', updatedBookmarks);
+          setBookmarks(updatedBookmarks);
+        } catch (refreshError) {
+          console.error('북마크 목록 새로고침 실패:', refreshError);
+          // 새로고침 실패 시 로컬 상태만 업데이트 (fallback)
+          setBookmarks(prev => prev.filter(b => b.restaurant_id !== restaurantId));
+        }
+        
+        alert('즐겨찾기가 해제되었습니다.');
+      } else {
+        throw new Error(response.data.error || '북마크 삭제 실패');
+      }
+    } catch (error: any) {
       console.error('즐겨찾기 해제 실패:', error);
-      alert('즐겨찾기 해제에 실패했습니다.');
+      const errorMessage = error.response?.data?.error || error.message || '즐겨찾기 해제에 실패했습니다.';
+      alert(errorMessage);
     }
   };
 
   const handleDeleteReview = async (reviewId: number) => {
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+    
     if (!confirm('리뷰를 삭제하시겠습니까?')) return;
 
     try {
-      await apiClient.delete(`/users/reviews/${reviewId}`);
-      setReviews(prev => prev.filter(review => review.id !== reviewId));
-      alert('리뷰가 삭제되었습니다.');
-    } catch (error) {
-      console.error('리뷰 삭제 실패:', error);
+      const response = await apiClient.delete(`/reviews/${reviewId}`);
+      if (response.data.success) {
+        // 삭제 성공 후 리뷰 목록 다시 가져오기
+        const reviewsResponse = await apiClient.get('/users/reviews');
+        if (reviewsResponse.data.success && reviewsResponse.data.data) {
+          const reviewsData = reviewsResponse.data.data.reviews || [];
+          const formattedReviews = reviewsData.map((item: any) => ({
+            id: item.id,
+            restaurantId: item.restaurantId,
+            restaurantName: item.restaurantName,
+            content: item.content,
+            rating: item.rating,
+            images: item.images || [],
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt || null,
+          }));
+          setReviews(formattedReviews);
+        }
+        alert('리뷰가 삭제되었습니다.');
+      } else {
+        throw new Error(response.data.error || '리뷰 삭제 실패');
+      }
+    } catch (err: any) {
+      console.error('리뷰 삭제 실패:', err);
+      // 401 에러인 경우 (인증 실패) 로그인 페이지로 리다이렉트
+      if (err.response?.status === 401) {
+        alert('로그인이 필요합니다.');
+        navigate('/login');
+        return;
+      }
+      // 403 에러인 경우 (권한 없음)
+      if (err.response?.status === 403) {
+        alert('본인의 리뷰만 삭제할 수 있습니다.');
+        return;
+      }
       alert('리뷰 삭제에 실패했습니다.');
     }
   };
 
   const handleUpdateReview = async (reviewId: number, updatedContent: string) => {
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      navigate('/login');
+      return;
+    }
+    
+    // 입력 검증
+    if (!updatedContent || updatedContent.trim().length === 0) {
+      alert('리뷰 내용을 입력해주세요.');
+      return;
+    }
+    
+    if (updatedContent.length > 2000) {
+      alert('리뷰는 최대 2000자까지 입력 가능합니다.');
+      return;
+    }
+    
     try {
-      await apiClient.put(`/users/reviews/${reviewId}`, { content: updatedContent });
-      setReviews(prev => 
-        prev.map(review => 
-          review.id === reviewId 
-            ? { ...review, content: updatedContent }
-            : review
-        )
-      );
-      alert('리뷰가 수정되었습니다.');
-    } catch (error) {
-      console.error('리뷰 수정 실패:', error);
+      const response = await apiClient.put(`/reviews/${reviewId}`, { 
+        content: updatedContent 
+      });
+      if (response.data.success && response.data.data) {
+        // 수정 성공 후 리뷰 목록 다시 가져오기
+        const reviewsResponse = await apiClient.get('/users/reviews');
+        if (reviewsResponse.data.success && reviewsResponse.data.data) {
+          const reviewsData = reviewsResponse.data.data.reviews || [];
+          const formattedReviews = reviewsData.map((item: any) => ({
+            id: item.id,
+            restaurantId: item.restaurantId,
+            restaurantName: item.restaurantName,
+            content: item.content,
+            rating: item.rating,
+            images: item.images || [],
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt || null,
+          }));
+          setReviews(formattedReviews);
+        }
+        alert('리뷰가 수정되었습니다.');
+      } else {
+        throw new Error(response.data.error || '리뷰 수정 실패');
+      }
+    } catch (err: any) {
+      console.error('리뷰 수정 실패:', err);
+      // 401 에러인 경우 (인증 실패) 로그인 페이지로 리다이렉트
+      if (err.response?.status === 401) {
+        alert('로그인이 필요합니다.');
+        navigate('/login');
+        return;
+      }
+      // 403 에러인 경우 (권한 없음)
+      if (err.response?.status === 403) {
+        alert('본인의 리뷰만 수정할 수 있습니다.');
+        return;
+      }
       alert('리뷰 수정에 실패했습니다.');
     }
   };

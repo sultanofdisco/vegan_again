@@ -3,23 +3,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ReviewsList.module.css';
 
-interface Restaurant {
-  id: number;
-  name: string;
-  address: string;
-  category: string;
-  phone: string | null;
-  latitude: number;
-  longitude: number;
-}
-
 interface Review {
   id: number;
-  restaurant: Restaurant;
-  rating: number;
+  restaurantId: number;
+  restaurantName: string;
   content: string;
-  image_url: string | null;
-  created_at: string;
+  rating: number;
+  images: string[];
+  createdAt: string;
+  updatedAt: string | null;
 }
 
 interface ReviewsListProps {
@@ -42,19 +34,6 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
     });
   };
 
-  const getCategoryIcon = (category: string): string => {
-    const categoryMap: { [key: string]: string } = {
-      '한식': '🍚',
-      '중식': '🥢',
-      '일식': '🍱',
-      '양식': '🍝',
-      '카페': '☕',
-      '분식': '🍜',
-      '디저트': '🍰',
-    };
-    return categoryMap[category] || '🍽️';
-  };
-
   const handleEdit = (review: Review) => {
     setEditingId(review.id);
     setEditContent(review.content);
@@ -65,8 +44,8 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
       alert('리뷰 내용을 입력해주세요.');
       return;
     }
-    if (editContent.length > 500) {
-      alert('리뷰는 최대 500자까지 입력 가능합니다.');
+    if (editContent.length > 2000) {
+      alert('리뷰는 최대 2000자까지 입력 가능합니다.');
       return;
     }
     onUpdate(reviewId, editContent);
@@ -113,20 +92,16 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
             {/* 식당 정보 */}
             <div 
               className={styles.restaurantInfo}
-              onClick={() => handleRestaurantClick(review.restaurant.id)}
+              onClick={() => handleRestaurantClick(review.restaurantId)}
             >
               <div className={styles.restaurantHeader}>
-                <span className={styles.categoryBadge}>
-                  {getCategoryIcon(review.restaurant.category)} {review.restaurant.category}
-                </span>
-                <h3 className={styles.restaurantName}>{review.restaurant.name}</h3>
+                <h3 className={styles.restaurantName}>{review.restaurantName}</h3>
               </div>
-              <p className={styles.address}>📍 {review.restaurant.address}</p>
             </div>
 
             {/* 리뷰 내용 */}
             <div className={styles.reviewContent}>
-              {/* 평점 - 기획서에는 없지만 기존 DB 구조에 있어서 포함 */}
+              {/* 평점 */}
               {review.rating && (
                 <div className={styles.rating}>
                   {'⭐'.repeat(review.rating)}
@@ -140,11 +115,11 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
                     value={editContent}
                     onChange={(e) => setEditContent(e.target.value)}
                     className={styles.textarea}
-                    maxLength={500}
+                    maxLength={2000}
                     rows={4}
                     placeholder="리뷰 내용을 입력하세요..."
                   />
-                  <div className={styles.charCount}>{editContent.length}/500</div>
+                  <div className={styles.charCount}>{editContent.length}/2000</div>
                   <div className={styles.editButtons}>
                     <button 
                       onClick={() => handleSaveEdit(review.id)}
@@ -165,20 +140,23 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
               )}
 
               {/* 리뷰 이미지 */}
-              {review.image_url && (
+              {review.images && review.images.length > 0 && (
                 <div className={styles.imageWrapper}>
-                  <img 
-                    src={review.image_url} 
-                    alt="리뷰 이미지" 
-                    className={styles.reviewImage}
-                  />
+                  {review.images.map((imageUrl, index) => (
+                    <img 
+                      key={index}
+                      src={imageUrl} 
+                      alt={`리뷰 이미지 ${index + 1}`} 
+                      className={styles.reviewImage}
+                    />
+                  ))}
                 </div>
               )}
             </div>
 
             {/* 메타 정보 및 액션 버튼 */}
             <div className={styles.footer}>
-              <span className={styles.date}>{formatDate(review.created_at)}</span>
+              <span className={styles.date}>{formatDate(review.createdAt)}</span>
               {editingId !== review.id && (
                 <div className={styles.actions}>
                   <button 

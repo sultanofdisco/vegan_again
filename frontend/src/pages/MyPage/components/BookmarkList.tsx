@@ -15,12 +15,13 @@ interface Restaurant {
 interface Bookmark {
   id: number;
   restaurant: Restaurant;
+  restaurant_id?: number; // restaurant_id 추가
   created_at: string;
 }
 
 interface BookmarksListProps {
   bookmarks: Bookmark[];
-  onRemove: (bookmarkId: number) => void;
+  onRemove: (bookmarkId: number, restaurantId: number) => void; // restaurantId도 전달
 }
 
 const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
@@ -78,8 +79,8 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
       </div>
 
       <div className={styles.list}>
-        {bookmarks.map((bookmark) => (
-          <div key={bookmark.id} className={styles.card}>
+        {bookmarks.map((bookmark, index) => (
+          <div key={`bookmark-${bookmark.id}-${index}`} className={styles.card}>
             <div 
               className={styles.cardContent}
               onClick={() => handleRestaurantClick(bookmark.restaurant.id)}
@@ -112,7 +113,8 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                onRemove(bookmark.id);
+                const restaurantId = bookmark.restaurant_id || bookmark.restaurant.id;
+                onRemove(bookmark.id, restaurantId);
               }}
               className={styles.removeButton}
               aria-label="즐겨찾기 해제"

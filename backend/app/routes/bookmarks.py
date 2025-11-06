@@ -88,23 +88,40 @@ def add_bookmark(restaurant_id, user_id):
 @login_required
 def remove_bookmark(restaurant_id, user_id):
     try:
+        # restaurant_id를 정수로 변환
+        try:
+            restaurant_id_int = int(restaurant_id)
+        except (ValueError, TypeError):
+            logger.error(f"잘못된 restaurant_id 형식: {restaurant_id}")
+            return jsonify({
+                "success": False,
+                "error": "잘못된 식당 ID입니다."
+            }), 400
+        
+        logger.info(f"북마크 삭제 시도: user_id={user_id}, restaurant_id={restaurant_id_int}")
+        
+        # 삭제 전 존재 확인
         existing = supabase.table('favorites') \
             .select('*') \
             .eq('user_id', user_id) \
-            .eq('restaurant_id', restaurant_id) \
+            .eq('restaurant_id', restaurant_id_int) \
             .execute()
 
         if not existing.data:
+            logger.warning(f"북마크를 찾을 수 없음: user_id={user_id}, restaurant_id={restaurant_id_int}")
             return jsonify({
                 "success": False,
                 "error": "즐겨찾기에 없는 식당입니다."
             }), 404
 
-        supabase.table('favorites') \
+        # 삭제 실행
+        result = supabase.table('favorites') \
             .delete() \
             .eq('user_id', user_id) \
-            .eq('restaurant_id', restaurant_id) \
+            .eq('restaurant_id', restaurant_id_int) \
             .execute()
+        
+        logger.info(f"북마크 삭제 성공: user_id={user_id}, restaurant_id={restaurant_id_int}, 삭제된 행 수: {len(result.data) if result.data else 0}")
 
         return jsonify({
             "success": True,

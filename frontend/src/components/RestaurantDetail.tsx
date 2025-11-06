@@ -7,6 +7,7 @@ import type { Restaurant } from '../types/restaurant';
 import type { Review } from '../types/review';
 import type { Menu } from '../types/menu';
 import { useUserStore } from '../stores/useUserStore';
+import apiClient from '../lib/axios';
 import { supabase } from '../lib/supabase';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -21,7 +22,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
     const user = useUserStore((state) => state.user);
     const [activeTab, setActiveTab] = useState<TabType>('menu');
     const [isBookmarked, setIsBookmarked] = useState(false);
-    const [bookmarkId, setBookmarkId] = useState<number | null>(null);
+    const [_bookmarkId, setBookmarkId] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [reviewsLoading, setReviewsLoading] = useState(true);
@@ -183,27 +184,36 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
         if (!user) return;
     
         try {
-            const { data, error } = await supabase
-                .from('bookmarks')
-                .select('id')
-                .eq('user_id', user.id)
-                .eq('restaurant_id', restaurantId)
-                .maybeSingle();
-    
-            if (error && error.code !== 'PGRST116') {
-                console.error('[Bookmark Check Error]:', error);
-                return;
-            }
-    
-            if (data) {
-                setIsBookmarked(true);
-                setBookmarkId(data.id);
+            // 백엔드 API로 북마크 목록 조회
+            const response = await apiClient.get('/users/bookmarks');
+            if (response.data.success && response.data.data) {
+                // 현재 식당이 북마크에 있는지 확인
+                // 백엔드 응답 형식: { restaurants: {...} } 또는 { restaurant_id: ... }
+                const bookmark = response.data.data.find(
+                    (item: any) => {
+                        const restaurantIdFromItem = 
+                            item.restaurant_id || 
+                            (item.restaurants && item.restaurants.id) ||
+                            (item.restaurant && item.restaurant.id);
+                        return restaurantIdFromItem === restaurantId;
+                    }
+                );
+                
+                if (bookmark) {
+                    setIsBookmarked(true);
+                    setBookmarkId(bookmark.id);
+                } else {
+                    setIsBookmarked(false);
+                    setBookmarkId(null);
+                }
             } else {
                 setIsBookmarked(false);
                 setBookmarkId(null);
             }
         } catch (error) {
             console.error('[Bookmark Check Failed]:', error);
+            setIsBookmarked(false);
+            setBookmarkId(null);
         }
     };
 
@@ -215,46 +225,22 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
     
         setLoading(true);
         try {
-            const { data: existingBookmark } = await supabase
-                .from('bookmarks')
-                .select('id')
-                .eq('user_id', user.id)
-                .eq('restaurant_id', restaurantId)
-                .maybeSingle();
-    
-            if (existingBookmark) {
-                alert('이미 즐겨찾기한 식당입니다.');
+            // 백엔드 API로 북마크 추가
+            const response = await apiClient.post(`/users/bookmarks/${restaurantId}`);
+            
+            if (response.data.success) {
                 setIsBookmarked(true);
-                setBookmarkId(existingBookmark.id);
-                setLoading(false);
-                return;
+                // 북마크 ID는 백엔드에서 반환하지 않으므로 상태 확인으로 다시 조회
+                await checkBookmarkStatus();
+                alert('찜 목록에 추가되었습니다!');
+            } else {
+                throw new Error(response.data.error || '북마크 추가 실패');
             }
-    
-            const { data, error } = await supabase
-                .from('bookmarks')
-                .insert({
-                    user_id: user.id,
-                    restaurant_id: restaurantId,
-                })
-                .select()
-                .single();
-    
-            if (error) {
-                if (error.code === '23505' || error.message?.includes('duplicate') || error.message?.includes('already exists')) {
-                    alert('이미 즐겨찾기한 식당입니다.');
-                    await checkBookmarkStatus();
-                    setLoading(false);
-                    return;
-                }
-                console.error('[Add Bookmark Error]:', error);
-                throw error;
-            }
-    
-            setIsBookmarked(true);
-            setBookmarkId(data.id);
-            alert('찜 목록에 추가되었습니다!');
         } catch (error: any) {
-            if (error.message?.includes('409') || error.status === 409) {
+            console.error('[Add Bookmark Error]:', error);
+            
+            // 409 에러는 이미 추가된 경우
+            if (error.response?.status === 409 || error.response?.status === 400) {
                 alert('이미 즐겨찾기한 식당입니다.');
                 await checkBookmarkStatus();
             } else {
@@ -266,24 +252,20 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
     };
 
     const handleRemoveBookmark = async () => {
-        if (!user || !bookmarkId) return;
+        if (!user) return;
 
         setLoading(true);
         try {
-            const { error } = await supabase
-                .from('bookmarks')
-                .delete()
-                .eq('id', bookmarkId)
-                .eq('user_id', user.id);
+            // 백엔드 API로 북마크 삭제
+            const response = await apiClient.delete(`/users/bookmarks/${restaurantId}`);
 
-            if (error) {
-                console.error('[Remove Bookmark Error]:', error);
-                throw error;
+            if (response.data.success) {
+                setIsBookmarked(false);
+                setBookmarkId(null);
+                alert('찜 해제되었습니다.');
+            } else {
+                throw new Error(response.data.error || '북마크 삭제 실패');
             }
-
-            setIsBookmarked(false);
-            setBookmarkId(null);
-            alert('찜 해제되었습니다.');
         } catch (error) {
             console.error('[Remove Bookmark Failed]:', error);
             alert('찜 해제에 실패했습니다. 다시 시도해주세요.');
@@ -301,7 +283,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
         }
     };
 
-    const uploadImage = async (file: File, userId: string): Promise<string | null> => {
+    const uploadImage = async (file: File, userId: number): Promise<string | null> => {
         const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
         if (file.size > MAX_FILE_SIZE) {
@@ -346,7 +328,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
 
             if (image) {
                 console.log('📝 [Submit Review] 이미지 업로드 시작...');
-                imageUrl = await uploadImage(image, user.id);
+                imageUrl = await uploadImage(image, user.user_id);
                 
                 if (imageUrl) {
                     console.log('✅ [Image Upload Success]:', imageUrl);
@@ -358,7 +340,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
             const { error } = await supabase
                 .from('reviews')
                 .insert({
-                    user_id: user.id,
+                    user_id: user.user_id,
                     restaurant_id: restaurantId,
                     content: content,
                     rating: rating,

@@ -52,8 +52,11 @@ app.register_blueprint(bookmarks_bp, url_prefix='/api/users')
 from app.routes.location import location_bp
 app.register_blueprint(location_bp, url_prefix='/api/users')
 
-from app.users.profile import profile_bp
+from app.profile.profile import profile_bp
 app.register_blueprint(profile_bp, url_prefix='/api/users')
+
+from app.routes.reviews import reviews_bp
+app.register_blueprint(reviews_bp, url_prefix='/api')
 
 
 @app.route('/')
