@@ -35,6 +35,7 @@ def login_required(f):
 
 
 @bookmarks_bp.route('/bookmarks/<restaurant_id>', methods=['POST'])
+@login_required
 def add_bookmark(restaurant_id, user_id):
     try:
         existing = supabase.table('favorites') \
@@ -68,6 +69,7 @@ def add_bookmark(restaurant_id, user_id):
 
 
 @bookmarks_bp.route('/bookmarks/<restaurant_id>', methods=['DELETE'])
+@login_required
 def remove_bookmark(restaurant_id, user_id):
     try:
         existing = supabase.table('favorites') \
@@ -102,6 +104,7 @@ def remove_bookmark(restaurant_id, user_id):
 
 
 @bookmarks_bp.route('/bookmarks', methods=['GET'])
+@login_required
 def get_bookmarks(user_id):
     try:
         response = supabase.table('favorites') \
