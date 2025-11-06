@@ -54,6 +54,37 @@
   font-weight: 500;
 }
 
+.locationButton {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  padding: 12px 20px;
+  background: white;
+  border: 2px solid #4CAF50;
+  border-radius: 25px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #4CAF50;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.locationButton:hover {
+  background: #4CAF50;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.locationButton:active {
+  transform: translateY(0);
+}
+
 @keyframes pulse {
 
   0%,
