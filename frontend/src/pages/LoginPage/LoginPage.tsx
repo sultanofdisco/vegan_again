@@ -1,17 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthError } from '@supabase/supabase-js';
 import styles from './LoginPage.module.css';
-import { supabase } from '../../lib/supabase';
+import apiClient from '../../lib/axios';
+import { useUserStore } from '../../stores/useUserStore';
 
 const LoginPage = () => {
   // State 선언
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [nickname, setNickname] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const navigate = useNavigate();
+  const { setUser } = useUserStore();
 
   // 이메일 형식 검증 함수
   const validateEmail = (email: string): boolean => {
@@ -19,25 +22,58 @@ const LoginPage = () => {
     return emailRegex.test(email);
   };
 
-  // 에러 메시지 한글화
+  // 에러 메시지 처리
   const getErrorMessage = (error: unknown): string => {
-    if (error instanceof AuthError) {
-      const errorMessages: Record<string, string> = {
-        'Invalid login credentials': '이메일 또는 비밀번호가 올바르지 않습니다.',
-        'Email not confirmed': '이메일 인증이 필요합니다.',
-        'User already registered': '이미 등록된 이메일입니다.',
-        'Password should be at least 6 characters': '비밀번호는 6자 이상이어야 합니다.',
-        'Email rate limit exceeded': '너무 많은 요청을 보냈습니다. 잠시 후 다시 시도해주세요.',
-        'Invalid email': '올바른 이메일 형식이 아닙니다.',
-        'Weak password': '비밀번호가 너무 약합니다. 더 강력한 비밀번호를 사용해주세요.',
-        'Network request failed': '네트워크 연결을 확인해주세요.',
+    console.error('Login error:', error); // 디버깅을 위한 콘솔 로그
+    
+    if (error && typeof error === 'object' && 'response' in error) {
+      const axiosError = error as { 
+        response?: { 
+          status?: number;
+          data?: { error?: string; message?: string };
+        };
+        message?: string;
       };
-      return errorMessages[error.message] || error.message;
+      
+      // HTTP 상태 코드별 에러 메시지
+      const status = axiosError.response?.status;
+      const errorMessage = axiosError.response?.data?.error || axiosError.response?.data?.message;
+      
+      if (errorMessage) {
+        return errorMessage;
+      }
+      
+      if (status === 404) {
+        return 'API를 찾을 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.';
+      }
+      if (status === 401) {
+        return '이메일 또는 비밀번호가 올바르지 않습니다.';
+      }
+      if (status === 400) {
+        return '요청 데이터가 올바르지 않습니다.';
+      }
+      if (status === 500) {
+        return '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+      }
+      if (status) {
+        return `요청 처리 중 오류가 발생했습니다. (상태 코드: ${status})`;
+      }
     }
+    
+    // 네트워크 에러
+    if (error && typeof error === 'object' && 'message' in error) {
+      const err = error as { message?: string };
+      if (err.message?.includes('Network Error') || err.message?.includes('Failed to fetch')) {
+        return '네트워크 연결을 확인해주세요. 백엔드 서버가 실행 중인지 확인하세요.';
+      }
+      return err.message || '요청 처리 중 오류가 발생했습니다.';
+    }
+    
     if (error instanceof Error) {
       return error.message;
     }
-    return String(error);
+    
+    return '알 수 없는 오류가 발생했습니다.';
   };
 
   // 로그인 핸들러
@@ -54,13 +90,16 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const response = await apiClient.post('/auth/login', {
         email,
         password,
       });
 
-      if (error) throw error;
-      navigate('/');
+      if (response.data.user) {
+        // 로그인 성공 - 사용자 정보를 스토어에 저장
+        setUser(response.data.user);
+        navigate('/');
+      }
       
     } catch (error) {
       setError(getErrorMessage(error));
@@ -80,23 +119,43 @@ const LoginPage = () => {
       return;
     }
 
-    // 비밀번호 길이 검증
-    if (password.length < 6) {
-      setError('비밀번호는 6자 이상이어야 합니다.');
+    // 비밀번호 길이 검증 (백엔드 요구사항: 최소 8자)
+    if (password.length < 8) {
+      setError('비밀번호는 최소 8자 이상이어야 합니다.');
+      return;
+    }
+
+    // 비밀번호 확인
+    if (password !== passwordConfirm) {
+      setError('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    // 닉네임 검증
+    if (!nickname.trim()) {
+      setError('닉네임을 입력해주세요.');
       return;
     }
 
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const response = await apiClient.post('/auth/signup', {
         email,
         password,
+        password_confirm: passwordConfirm,
+        nickname: nickname.trim(),
       });
 
-      if (error) throw error;
-      alert('회원가입 성공! 이메일을 확인해주세요.');
-      setMode('login');
+      if (response.data.user) {
+        alert('회원가입 성공!');
+        setMode('login');
+        // 입력 필드 초기화
+        setEmail('');
+        setPassword('');
+        setPasswordConfirm('');
+        setNickname('');
+      }
       
     } catch (error) {
       setError(getErrorMessage(error));
@@ -105,25 +164,10 @@ const LoginPage = () => {
     }
   };
 
-  // 소셜 로그인 핸들러
+  // 소셜 로그인 핸들러 (현재 미구현 - OAuth 기능 제외)
   const handleSocialLogin = async (provider: 'google' | 'kakao') => {
-    setError(null);
-    setLoading(true);
-
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: provider,
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
-
-      if (error) throw error;
-      
-    } catch (error) {
-      setError(getErrorMessage(error));
-      setLoading(false);
-    }
+    setError(`${provider} 로그인은 현재 준비 중입니다.`);
+    setLoading(false);
   };
 
   // 렌더링
@@ -151,6 +195,15 @@ const LoginPage = () => {
         <h2>{mode === 'login' ? '로그인' : '회원가입'}</h2>
         
         <form onSubmit={mode === 'login' ? handleLogin : handleSignUp}>
+          {mode === 'signup' && (
+            <input
+              type="text"
+              placeholder="닉네임"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              required
+            />
+          )}
           <input
             type="email"
             placeholder="이메일"
@@ -160,12 +213,22 @@ const LoginPage = () => {
           />
           <input
             type="password"
-            placeholder="비밀번호 (6자 이상)"
+            placeholder={mode === 'login' ? '비밀번호' : '비밀번호 (8자 이상)'}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            minLength={6}
+            minLength={mode === 'signup' ? 8 : undefined}
             required
           />
+          {mode === 'signup' && (
+            <input
+              type="password"
+              placeholder="비밀번호 확인"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+              minLength={8}
+              required
+            />
+          )}
           
           <button type="submit" disabled={loading}>
             {loading 
@@ -179,6 +242,9 @@ const LoginPage = () => {
             onClick={() => {
               setMode(mode === 'login' ? 'signup' : 'login');
               setError(null);
+              setPassword('');
+              setPasswordConfirm('');
+              setNickname('');
             }}
             disabled={loading}
             className={styles.switchButton}

@@ -1,13 +1,14 @@
 // Header.tsx
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useUserStore } from '../../stores/useUserStore';
-import { supabase } from '../../lib/supabase';
+import apiClient from '../../lib/axios';
 import styles from './Header.module.css';
 import { useSearchStore } from '../../stores/useSearchStore';
 import { useState, useRef } from 'react';
 
 const Header = () => {
   const user = useUserStore((state) => state.user);
+  const { setUser } = useUserStore();
   const navigate = useNavigate();
   const location = useLocation();
   const { searchText, setSearchText } = useSearchStore();
@@ -19,11 +20,14 @@ const Header = () => {
   const hideSearchBar = location.pathname === '/mypage';
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+    try {
+      await apiClient.post('/auth/logout');
+      setUser(null); // 스토어에서 사용자 정보 제거
+      navigate('/');
+    } catch (error) {
       console.error('Logout Error:', error);
-      alert('로그아웃 실패: ' + error.message);
-    } else {
+      // 로그아웃 실패해도 클라이언트 상태는 초기화
+      setUser(null);
       navigate('/');
     }
   };

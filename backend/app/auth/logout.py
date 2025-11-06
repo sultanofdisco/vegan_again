@@ -13,9 +13,10 @@ def logout_user():
         
         # 로깅 (민감한 정보 제외)
         user_email = session.get('email', 'unknown')
-        logger.info(f'사용자 로그아웃: {user_email}')
+        user_id = session.get('user_id')
+        logger.info(f'사용자 로그아웃: {user_email}, User ID: {user_id}')
         
-        # 세션 삭제
+        # 세션 완전 삭제 (보안 강화)
         session.clear()
         
         return jsonify({

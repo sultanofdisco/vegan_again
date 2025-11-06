@@ -73,3 +73,109 @@
 2025-11-06 21:50:20,657 - werkzeug - INFO -  * Restarting with stat
 2025-11-06 21:50:21,816 - werkzeug - WARNING -  * Debugger is active!
 2025-11-06 21:50:21,823 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:04:33,571 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-06 22:04:33,571 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 22:04:33,572 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:04:34,514 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:04:34,522 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:06:41,912 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:06:41] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:06:41,920 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:06:41] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:06:55,475 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:06:55] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:06:55,482 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:06:55] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:10:52,085 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:10:52] "[31m[1mPOST /api/auth/login HTTP/1.1[0m" 401 -
+2025-11-06 22:11:33,164 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:11:33] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-06 22:12:57,066 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:12:57] "[31m[1mPOST /api/auth/logout HTTP/1.1[0m" 401 -
+2025-11-06 22:12:58,510 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:12:58] "[31m[1mPOST /api/auth/logout HTTP/1.1[0m" 401 -
+2025-11-06 22:13:00,044 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:13:00] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:13:00,054 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:13:00] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:13:18,800 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:13:18] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-06 22:14:06,752 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:14:06] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:14:06,763 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:14:06] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:20:34,005 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:20:34] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:20:34,012 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:20:34] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:21:18,578 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:21:18] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-06 22:22:34,014 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\bookmarks.py', reloading
+2025-11-06 22:22:34,134 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:22:35,028 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:22:35,034 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:23:00,672 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\main.py', reloading
+2025-11-06 22:23:00,760 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:23:01,600 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:23:01,607 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:24:13,183 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:24:13] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:24:21,040 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-06 22:24:21,130 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:24:22,085 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:24:22,091 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:24:34,030 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\main.py', reloading
+2025-11-06 22:24:34,130 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:24:35,345 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:24:35,353 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:24:35,982 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:24:35] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:24:36,356 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-06 22:24:36,540 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:24:38,051 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:24:38,059 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:30:55,500 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\user\\profile.py', reloading
+2025-11-06 22:30:55,650 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:30:56,637 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:30:56,642 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:31:09,627 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\main.py', reloading
+2025-11-06 22:31:09,717 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:31:10,516 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:31:10,522 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:31:31,927 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\main.py', reloading
+2025-11-06 22:31:32,007 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:31:32,917 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:31:32,922 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:35:13,596 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\user\\profile.py', reloading
+2025-11-06 22:35:13,704 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:35:14,601 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:35:14,610 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:35:22,325 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\main.py', reloading
+2025-11-06 22:35:22,400 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:35:23,223 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:35:23,228 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:37:45,088 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-06 22:37:45,088 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 22:37:45,089 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:37:45,948 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:37:45,954 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:39:39,183 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-06 22:39:39,183 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 22:39:39,184 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:39:40,005 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:39:40,011 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:47:14,217 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\main.py', reloading
+2025-11-06 22:47:14,311 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:47:15,258 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:47:15,264 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:47:25,855 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\main.py', reloading
+2025-11-06 22:47:25,964 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:47:26,794 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:47:26,799 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:48:21,102 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:48:21] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:48:21,117 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:48:21] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:48:39,955 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:48:39] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:48:39,962 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:48:39] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:48:44,924 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\main.py', reloading
+2025-11-06 22:48:45,009 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:49:02,292 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-06 22:49:02,292 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 22:49:02,293 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:49:03,109 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:49:03,116 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:49:25,219 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:49:25] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:49:25,232 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:49:25] "[33mGET /api/auth/me HTTP/1.1[0m" 404 -
+2025-11-06 22:53:06,870 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-06 22:53:06,870 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 22:53:06,872 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:53:07,720 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:53:07,726 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:53:53,916 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:53:53] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-06 22:54:00,620 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:54:00] "POST /api/auth/logout HTTP/1.1" 200 -
