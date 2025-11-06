@@ -5,7 +5,6 @@ import apiClient from '../../lib/axios';
 import { useUserStore } from '../../stores/useUserStore';
 
 const LoginPage = () => {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -16,33 +15,28 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const { setUser } = useUserStore();
 
-  // 이메일 형식 검증 함수
   const validateEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  // 에러 메시지 처리
   const getErrorMessage = (error: unknown): string => {
-    console.error('Login error:', error); // 디버깅을 위한 콘솔 로그
-    
     if (error && typeof error === 'object' && 'response' in error) {
-      const axiosError = error as { 
-        response?: { 
+      const axiosError = error as {
+        response?: {
           status?: number;
           data?: { error?: string; message?: string };
         };
         message?: string;
       };
-      
-      // HTTP 상태 코드별 에러 메시지
+
       const status = axiosError.response?.status;
       const errorMessage = axiosError.response?.data?.error || axiosError.response?.data?.message;
-      
+
       if (errorMessage) {
         return errorMessage;
       }
-      
+
       if (status === 404) {
         return 'API를 찾을 수 없습니다. 백엔드 서버가 실행 중인지 확인해주세요.';
       }
@@ -59,8 +53,7 @@ const LoginPage = () => {
         return `요청 처리 중 오류가 발생했습니다. (상태 코드: ${status})`;
       }
     }
-    
-    // 네트워크 에러
+
     if (error && typeof error === 'object' && 'message' in error) {
       const err = error as { message?: string };
       if (err.message?.includes('Network Error') || err.message?.includes('Failed to fetch')) {
@@ -68,20 +61,18 @@ const LoginPage = () => {
       }
       return err.message || '요청 처리 중 오류가 발생했습니다.';
     }
-    
+
     if (error instanceof Error) {
       return error.message;
     }
-    
+
     return '알 수 없는 오류가 발생했습니다.';
   };
 
-  // 로그인 핸들러
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    
-    // 이메일 형식 검증
+
     if (!validateEmail(email)) {
       setError('올바른 이메일 형식이 아닙니다.');
       return;
@@ -96,11 +87,9 @@ const LoginPage = () => {
       });
 
       if (response.data.user) {
-        // 로그인 성공 - 사용자 정보를 스토어에 저장
         setUser(response.data.user);
         navigate('/');
       }
-      
     } catch (error) {
       setError(getErrorMessage(error));
     } finally {
@@ -108,30 +97,25 @@ const LoginPage = () => {
     }
   };
 
-  // 회원가입 핸들러
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    // 이메일 형식 검증
     if (!validateEmail(email)) {
       setError('올바른 이메일 형식이 아닙니다.');
       return;
     }
 
-    // 비밀번호 길이 검증 (백엔드 요구사항: 최소 8자)
     if (password.length < 8) {
       setError('비밀번호는 최소 8자 이상이어야 합니다.');
       return;
     }
 
-    // 비밀번호 확인
     if (password !== passwordConfirm) {
       setError('비밀번호가 일치하지 않습니다.');
       return;
     }
 
-    // 닉네임 검증
     if (!nickname.trim()) {
       setError('닉네임을 입력해주세요.');
       return;
@@ -150,13 +134,11 @@ const LoginPage = () => {
       if (response.data.user) {
         alert('회원가입 성공!');
         setMode('login');
-        // 입력 필드 초기화
         setEmail('');
         setPassword('');
         setPasswordConfirm('');
         setNickname('');
       }
-      
     } catch (error) {
       setError(getErrorMessage(error));
     } finally {
@@ -164,7 +146,6 @@ const LoginPage = () => {
     }
   };
 
-  // 소셜 로그인 핸들러 (현재 미구현 - OAuth 기능 제외)
   const handleSocialLogin = async (provider: 'google' | 'kakao') => {
     setError(`${provider} 로그인은 현재 준비 중입니다.`);
     setLoading(false);
@@ -174,14 +155,14 @@ const LoginPage = () => {
     <>
       <header className={styles.simpleHeader}>
         <div className={styles.headerContainer}>
-          <button 
-            onClick={() => navigate('/')} 
+          <button
+            onClick={() => navigate('/')}
             className={styles.logoButton}
           >
             🌱비건어게인
           </button>
-          <button 
-            onClick={() => navigate('/')} 
+          <button
+            onClick={() => navigate('/')}
             className={styles.backButton}
           >
             ← 메인으로
@@ -191,7 +172,7 @@ const LoginPage = () => {
 
       <div className={styles.container}>
         <h2>{mode === 'login' ? '로그인' : '회원가입'}</h2>
-        
+
         <form onSubmit={mode === 'login' ? handleLogin : handleSignUp}>
           {mode === 'signup' && (
             <input
@@ -227,16 +208,15 @@ const LoginPage = () => {
               required
             />
           )}
-          
+
           <button type="submit" disabled={loading}>
-            {loading 
-              ? (mode === 'login' ? '로그인 중...' : '가입 중...') 
-              : (mode === 'login' ? '로그인' : '회원가입')
-            }
+            {loading
+              ? (mode === 'login' ? '로그인 중...' : '가입 중...')
+              : (mode === 'login' ? '로그인' : '회원가입')}
           </button>
-          
-          <button 
-            type="button" 
+
+          <button
+            type="button"
             onClick={() => {
               setMode(mode === 'login' ? 'signup' : 'login');
               setError(null);
@@ -283,7 +263,7 @@ const LoginPage = () => {
             카카오로 계속하기
           </button>
         </div>
-        
+
         {error && <p className={styles.error}>{error}</p>}
       </div>
     </>

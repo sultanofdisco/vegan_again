@@ -1,4 +1,4 @@
-import { useState, type MouseEvent } from 'react'; 
+import { useState, type MouseEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Review } from '../types/review';
 import styles from './ReviewList.module.css';
@@ -6,17 +6,16 @@ import styles from './ReviewList.module.css';
 interface ReviewListProps {
   reviews: Review[];
   isLoggedIn: boolean;
-  onSubmitReview: (content: string, image: File | null, rating: number) => Promise<void>;  // ✅ 수정
+  onSubmitReview: (content: string, image: File | null, rating: number) => Promise<void>;
 }
 
 function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
-  
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const [visibleCount, setVisibleCount] = useState(3);
   const [reviewContent, setReviewContent] = useState('');
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);      // ✅ 수정
-  const [previewUrl, setPreviewUrl] = useState<string>('');                   // ✅ 수정
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,18 +34,14 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    
     if (!file) return;
-
     if (!file.type.startsWith('image/')) {
       alert('이미지 파일만 업로드할 수 있습니다.');
       return;
     }
-
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
-
     setSelectedImage(file);
     setPreviewUrl(URL.createObjectURL(file));
   };
@@ -61,7 +56,7 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!reviewContent.trim()) {
       alert('리뷰 내용을 입력해주세요.');
       return;
@@ -79,20 +74,16 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
 
     setIsSubmitting(true);
     try {
-      await onSubmitReview(reviewContent, selectedImage, rating);  // ✅ 수정
-      
-      // 초기화
+      await onSubmitReview(reviewContent, selectedImage, rating);
       setReviewContent('');
-      setSelectedImage(null);                                       // ✅ 수정
-      if (previewUrl) {                                            // ✅ 수정
+      setSelectedImage(null);
+      if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
-      setPreviewUrl('');                                           // ✅ 수정
+      setPreviewUrl('');
       setRating(0);
-      
       alert('리뷰가 등록되었습니다!');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error) {
+    } catch {
       alert('리뷰 등록에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
@@ -100,11 +91,10 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
   };
 
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); 
-
-    navigate('/login'); 
+    e.preventDefault();
+    navigate('/login');
   };
-  
+
   const visibleReviews = reviews.slice(0, visibleCount);
   const hasMore = visibleCount < reviews.length;
 
@@ -163,7 +153,7 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
           </div>
 
           {hasMore && (
-            <button 
+            <button
               className={styles.loadMoreButton}
               onClick={handleLoadMore}
             >
@@ -176,7 +166,7 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
       {isLoggedIn ? (
         <form className={styles.reviewForm} onSubmit={handleSubmit}>
           <h3 className={styles.formTitle}>리뷰 작성하기</h3>
-          
+
           <div className={styles.ratingSection}>
             <div className={styles.stars}>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -188,11 +178,13 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                 >
-                  <span className={
-                    star <= (hoverRating || rating) 
-                      ? styles.starFilled 
-                      : styles.starEmpty
-                  }>
+                  <span
+                    className={
+                      star <= (hoverRating || rating)
+                        ? styles.starFilled
+                        : styles.starEmpty
+                    }
+                  >
                     {star <= (hoverRating || rating) ? '⭐' : '◼️'}
                   </span>
                 </button>
@@ -211,9 +203,9 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
               accept="image/*"
               onChange={handleImageSelect}
               className={styles.imageUploadInput}
-              disabled={!!selectedImage} 
+              disabled={!!selectedImage}
             />
-            
+
             {previewUrl && (
               <div className={styles.imagePreviews}>
                 <div className={styles.imagePreview}>
@@ -255,7 +247,7 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
       ) : (
         <div className={styles.loginPrompt}>
           <p>리뷰를 작성하려면 로그인이 필요합니다.</p>
-          <button 
+          <button
             className={styles.loginButton}
             onClick={handleLoginClick}
           >

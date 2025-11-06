@@ -28,45 +28,31 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
     if (!dateString || dateString === 'null' || dateString === '') {
       return '';
     }
-    
     try {
-      // ISO 8601 형식의 날짜 문자열 파싱
       const date = new Date(dateString);
-      
-      // 유효하지 않은 날짜인지 확인
       if (isNaN(date.getTime())) {
-        console.warn('유효하지 않은 날짜:', dateString);
         return '';
       }
-      
-      // 날짜가 너무 오래된 경우 (1970년 이전) 무시
       if (date.getFullYear() < 1970) {
-        console.warn('날짜가 너무 오래됨:', dateString);
         return '';
       }
-      
-      // 한국어 형식으로 포맷팅
       return date.toLocaleDateString('ko-KR', {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
       });
-    } catch (error) {
-      console.error('날짜 포맷 오류:', error, dateString);
+    } catch {
       return '';
     }
   };
 
   const getDisplayDate = (review: Review): string => {
-    // updatedAt이 있고 유효한 날짜인 경우
     if (review.updatedAt && review.updatedAt !== 'null' && review.updatedAt !== '') {
       const updatedDate = formatDate(review.updatedAt);
       if (updatedDate) {
         return updatedDate;
       }
     }
-    
-    // createdAt 사용
     return formatDate(review.createdAt);
   };
 
@@ -106,7 +92,7 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
         <p className={styles.emptySubtext}>
           방문한 식당에 리뷰를 남겨보세요!
         </p>
-        <button 
+        <button
           onClick={() => navigate('/')}
           className={styles.goToMainButton}
         >
@@ -125,7 +111,7 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
       <div className={styles.list}>
         {reviews.map((review) => (
           <div key={review.id} className={styles.card}>
-            <div 
+            <div
               className={styles.restaurantInfo}
               onClick={() => handleRestaurantClick(review.restaurantId)}
             >
@@ -135,7 +121,6 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
             </div>
 
             <div className={styles.reviewContent}>
-              {/* 평점 */}
               {review.rating && (
                 <div className={styles.rating}>
                   {'⭐'.repeat(review.rating)}
@@ -154,13 +139,13 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
                   />
                   <div className={styles.charCount}>{editContent.length}/2000</div>
                   <div className={styles.editButtons}>
-                    <button 
+                    <button
                       onClick={() => handleSaveEdit(review.id)}
                       className={styles.saveButton}
                     >
                       저장
                     </button>
-                    <button 
+                    <button
                       onClick={handleCancelEdit}
                       className={styles.cancelButton}
                     >
@@ -172,14 +157,13 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
                 <p className={styles.content}>{review.content}</p>
               )}
 
-              {/* 리뷰 이미지 */}
               {review.images && review.images.length > 0 && (
                 <div className={styles.imageWrapper}>
                   {review.images.map((imageUrl, index) => (
-                    <img 
+                    <img
                       key={index}
-                      src={imageUrl} 
-                      alt={`리뷰 이미지 ${index + 1}`} 
+                      src={imageUrl}
+                      alt={`리뷰 이미지 ${index + 1}`}
                       className={styles.reviewImage}
                     />
                   ))}
@@ -193,13 +177,13 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
               </span>
               {editingId !== review.id && (
                 <div className={styles.actions}>
-                  <button 
+                  <button
                     onClick={() => handleEdit(review)}
                     className={styles.editButton}
                   >
                     수정
                   </button>
-                  <button 
+                  <button
                     onClick={() => onDelete(review.id)}
                     className={styles.deleteButton}
                   >

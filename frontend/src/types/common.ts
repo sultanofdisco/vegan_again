@@ -6,7 +6,7 @@ export type VegetarianLevel =
   | 'pesco'              // 페스코 베지테리언
   | 'pollo'              // 폴로 베지테리언
   | 'flexitarian'        // 플렉시테리언
-  | 'others';            // 기타 ← 추가
+  | 'others';            // 기타 
 
 /** 채식 단계 한글 라벨 */
 export const VegetarianLevelLabel: Record<VegetarianLevel, string> = {
@@ -17,7 +17,7 @@ export const VegetarianLevelLabel: Record<VegetarianLevel, string> = {
   pesco: '페스코',
   pollo: '폴로',
   flexitarian: '플렉시테리언',
-  others: '기타',  // ← 추가
+  others: '기타', 
 };
 
 /** 채식 단계 이모지 */
@@ -53,7 +53,7 @@ export const VegetarianLevelDescription: Record<VegetarianLevel, string> = {
   pesco: '유제품, 달걀, 생선 가능',
   pollo: '유제품, 달걀, 생선, 닭고기 가능',
   flexitarian: '모든 음식 가능 (간헐적 채식)',
-  others: '분류되지 않은 메뉴',  // ← 추가
+  others: '분류되지 않은 메뉴', 
 };
 
 /** 채식 단계별 허용 식품 아이콘 */

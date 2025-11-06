@@ -145,15 +145,12 @@
   align-items: center;
 }
 
-/* ⬅️➡️ 옆으로 뜨는 말풍선 (기본: 오른쪽) */
 .tooltip {
   position: absolute;
   top: 50%;
   left: calc(100% + 20px);
-  /* 이름 오른쪽으로 10px 떨어져 */
   transform: translateY(-50%) translateX(4px);
   width: 300px;
-  /* 폭 고정: 모양/정렬 안정 */
   background: #333;
   color: #fff;
   padding: 10px 14px;
@@ -173,39 +170,31 @@
   font-family: 'Pretendard', sans-serif;
 }
 
-/* 화살표: 왼쪽 변에서 오른쪽을 향하도록(오른쪽 말풍선) */
 .tooltip::after {
   content: "";
   position: absolute;
   top: 50%;
   left: -5px;
-  /* 말풍선 바깥으로 살짝 */
   width: 10px;
   height: 10px;
   background: #333;
   transform: translateY(-50%) rotate(45deg);
-  /* 회전 정사각형 화살표 */
   box-shadow: 0 2px 4px rgba(0, 0, 0, .12);
 }
 
-/* hover 시 노출 */
 .menuNameWrapper:hover .tooltip {
   opacity: 1;
   visibility: visible;
   transform: translateY(-50%) translateX(0);
 }
 
-/* ▸ 왼쪽 말풍선이 필요할 때는 .left 클래스만 추가 */
 .tooltip.left {
   left: auto;
   right: calc(100% + 10px);
-  /* 이름 왼쪽으로 10px 떨어져 */
   transform: translateY(-50%) translateX(-4px);
   text-align: right;
-  /* 선택 사항 */
 }
 
-/* 왼쪽 말풍선 화살표는 오른쪽 변으로 이동 */
 .tooltip.left::after {
   left: auto;
   right: -5px;

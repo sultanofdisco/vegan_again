@@ -132,7 +132,6 @@ function MainPage() {
     <FilterPanel />
 
     <div className={styles.contentWrapper}>
-      {/* 검색어가 있을 때만 리스트 표시 */}
       {searchText && (
         <RestaurantListPanel 
           restaurants={filteredRestaurants}

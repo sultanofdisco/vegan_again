@@ -22,20 +22,17 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 프로필이 변경될 때마다 상태 업데이트
   useEffect(() => {
     setNickname(profile.nickname);
     setBio(profile.bio || '');
   }, [profile]);
 
   const validateNickname = (value: string): boolean => {
-    // 2-20자, 한글/영문/숫자만 허용
     const regex = /^[가-힣a-zA-Z0-9]{2,20}$/;
     return regex.test(value);
   };
 
   const validateBio = (value: string): boolean => {
-    // 최대 200자
     return value.length <= 200;
   };
 
@@ -49,9 +46,8 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 파일 검증
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-    const maxSize = 5 * 1024 * 1024; // 5MB
+    const maxSize = 5 * 1024 * 1024;
 
     if (!allowedTypes.includes(file.type)) {
       alert('JPG, PNG, WEBP 이미지만 업로드 가능합니다.');
@@ -65,7 +61,6 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
 
     setUploading(true);
     try {
-      // 기존 이미지가 있으면 삭제
       if (profile.profile_image_url) {
         const oldPath = profile.profile_image_url.split('/').pop();
         if (oldPath) {
@@ -75,7 +70,6 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
         }
       }
 
-      // 새 이미지 업로드
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${profile.user_id}/${fileName}`;
@@ -95,15 +89,13 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
 
       await onUpdate({ profile_image_url: urlData.publicUrl });
       alert('프로필 이미지가 변경되었습니다.');
-    } catch (error) {
-      console.error('이미지 업로드 실패:', error);
+    } catch {
       alert('이미지 업로드에 실패했습니다.');
       setUploading(false);
     }
   };
 
   const handleSave = async () => {
-    // 유효성 검사
     if (!validateNickname(nickname)) {
       alert('닉네임은 2-20자의 한글, 영문, 숫자만 사용 가능합니다.');
       return;
@@ -129,9 +121,9 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
       <div className={styles.profileHeader}>
         <div className={styles.imageWrapper} onClick={handleImageClick}>
           {profile.profile_image_url ? (
-            <img 
-              src={profile.profile_image_url} 
-              alt="프로필" 
+            <img
+              src={profile.profile_image_url}
+              alt="프로필"
               className={styles.profileImage}
             />
           ) : (
@@ -192,23 +184,21 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
               {profile.bio || '자기소개가 없습니다.'}
             </div>
           )}
-          {isEditing && (
-            <div className={styles.charCount}>{bio.length}/200</div>
-          )}
+          {isEditing && <div className={styles.charCount}>{bio.length}/200</div>}
         </div>
 
         <div className={styles.buttonGroup}>
           {isEditing ? (
             <>
-              <button 
-                onClick={handleSave} 
+              <button
+                onClick={handleSave}
                 className={styles.saveButton}
                 disabled={uploading}
               >
                 저장
               </button>
-              <button 
-                onClick={handleCancel} 
+              <button
+                onClick={handleCancel}
                 className={styles.cancelButton}
                 disabled={uploading}
               >
@@ -216,8 +206,8 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
               </button>
             </>
           ) : (
-            <button 
-              onClick={() => setIsEditing(true)} 
+            <button
+              onClick={() => setIsEditing(true)}
               className={styles.editButton}
             >
               프로필 수정

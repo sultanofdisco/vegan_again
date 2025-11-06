@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useNavigate } from 'react-router-dom';
-import styles from './BookmarkList.module.css'; 
+import styles from './BookmarkList.module.css';
 
 interface Restaurant {
   id: number;
@@ -14,13 +15,13 @@ interface Restaurant {
 interface Bookmark {
   id: number;
   restaurant: Restaurant;
-  restaurant_id?: number; // restaurant_id 추가
+  restaurant_id?: number;
   created_at: string;
 }
 
 interface BookmarksListProps {
   bookmarks: Bookmark[];
-  onRemove: (bookmarkId: number, restaurantId: number) => void; // restaurantId도 전달
+  onRemove: (bookmarkId: number, restaurantId: number) => void;
 }
 
 const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
@@ -59,7 +60,7 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
         <p className={styles.emptySubtext}>
           마음에 드는 식당을 즐겨찾기에 추가해보세요!
         </p>
-        <button 
+        <button
           onClick={() => navigate('/')}
           className={styles.goToMainButton}
         >
@@ -78,7 +79,7 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
       <div className={styles.list}>
         {bookmarks.map((bookmark, index) => (
           <div key={`bookmark-${bookmark.id}-${index}`} className={styles.card}>
-            <div 
+            <div
               className={styles.cardContent}
               onClick={() => handleRestaurantClick(bookmark.restaurant.id)}
             >
@@ -110,13 +111,11 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                // 북마크의 restaurant_id를 우선 사용, 없으면 restaurant 객체에서 가져오기
-                // 백엔드에서 조인된 restaurants 객체는 restaurant_id를 가질 수 있음
-                const restaurantId = bookmark.restaurant_id || 
-                                     (bookmark.restaurant as any)?.restaurant_id || 
-                                     bookmark.restaurant?.id;
+                const restaurantId =
+                  bookmark.restaurant_id ||
+                  (bookmark.restaurant as any)?.restaurant_id ||
+                  bookmark.restaurant?.id;
                 if (!restaurantId) {
-                  console.error('restaurant_id를 찾을 수 없습니다:', bookmark);
                   alert('북마크 데이터 오류가 발생했습니다.');
                   return;
                 }

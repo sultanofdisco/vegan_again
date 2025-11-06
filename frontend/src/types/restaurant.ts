@@ -6,11 +6,11 @@ export interface RestaurantSchema {
   name: string;
   address: string;
   phone: string | null;
-  latitude: number;                    // DECIMAL(10, 8)
-  longitude: number;                   // DECIMAL(11, 8)
-  category: string;                    // VARCHAR(50)
-  business_hours: string | null;       // TEXT
-  data_source: string | null;          // VARCHAR(100)
+  latitude: number;
+  longitude: number;
+  category: string;
+  business_hours: string | null;
+  data_source: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -39,30 +39,23 @@ export interface RestaurantUpdate {
 }
 
 export interface Restaurant {
-  id: number;                          
+  id: number;
   name: string;
   address: string;
-  location: Location;              
+  location: Location;
   phone?: string;
-  category: FoodCategory;        
-  
-  openingHours?: string;           
-  closedDays?: string[];        
-  
+  category: FoodCategory;
+  openingHours?: string;
+  closedDays?: string[];
   menus: Menu[];
-  
   availableLevels: VegetarianLevel[];
-  
   rating?: number;
   reviewCount: number;
-  
   imageUrls?: string[];
   thumbnailUrl?: string;
-  
-  dataSource?: string;               
+  dataSource?: string;
   createdAt: string;
   updatedAt: string;
-  
   isBookmarked?: boolean;
 }
 
@@ -71,10 +64,9 @@ export interface RestaurantFilter {
   vegetarianLevel?: VegetarianLevel;
   searchText?: string;
   region?: string;
-  
   bounds?: {
-    sw: Location;  
-    ne: Location;  
+    sw: Location;
+    ne: Location;
   };
 }
 
@@ -110,7 +102,6 @@ export function restaurantSchemaToRestaurant(
   rating?: number,
   isBookmarked?: boolean
 ): Restaurant {
-  // 메뉴에서 사용 가능한 채식 단계 추출
   const availableLevels = Array.from(
     new Set(
       menus
@@ -119,7 +110,6 @@ export function restaurantSchemaToRestaurant(
     )
   );
 
-  // category를 FoodCategory로 매핑
   let category: FoodCategory = 'etc';
   const categoryLower = schema.category?.toLowerCase() || '';
   if (['한식', 'korean'].some(k => categoryLower.includes(k))) category = 'korean';
@@ -151,7 +141,6 @@ export function restaurantSchemaToRestaurant(
   };
 }
 
-/** UI 타입 → DB Insert 변환 */
 export function restaurantToInsert(restaurant: CreateRestaurantRequest): RestaurantInsert {
   return {
     name: restaurant.name,
@@ -165,7 +154,6 @@ export function restaurantToInsert(restaurant: CreateRestaurantRequest): Restaur
   };
 }
 
-/** UI 타입 → DB Update 변환 */
 export function restaurantToUpdate(restaurant: Partial<CreateRestaurantRequest>): RestaurantUpdate {
   const update: RestaurantUpdate = {
     updated_at: new Date().toISOString(),
@@ -183,15 +171,14 @@ export function restaurantToUpdate(restaurant: Partial<CreateRestaurantRequest>)
   return update;
 }
 
-/** 카카오맵 API에서 받아온 원본 데이터 */
 export interface KakaoMapPlaceData {
   id: string;
   place_name: string;
   address_name: string;
   road_address_name?: string;
   phone?: string;
-  x: string;  // 경도 
-  y: string;  // 위도 
+  x: string;
+  y: string;
   place_url?: string;
   category_name?: string;
 }
@@ -213,15 +200,15 @@ export function kakaoMapToRestaurantInsert(
 }
 
 export function calculateDistance(loc1: Location, loc2: Location): number {
-  const R = 6371; // 지구 반지름 (km)
+  const R = 6371;
   const dLat = (loc2.lat - loc1.lat) * Math.PI / 180;
   const dLng = (loc2.lng - loc1.lng) * Math.PI / 180;
-  
-  const a = 
+
+  const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(loc1.lat * Math.PI / 180) * Math.cos(loc2.lat * Math.PI / 180) *
     Math.sin(dLng / 2) * Math.sin(dLng / 2);
-  
+
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return R * c;
 }
