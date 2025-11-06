@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import Map from '../../components/Map';
 import FilterPanel from './components/FilterPanel';
-import RestaurantListPanel from './components/RestaurantListPanel'; // ← 추가
+import RestaurantListPanel from './components/RestaurantListPanel';
+import LocationPermissionModal from '../../components/LocationPermissionModal'; // ✅ 추가
 import { searchRestaurants } from '../../api/restaurant';
 import { useSearchStore } from '../../stores/useSearchStore';
+import { useGeolocation } from '../../hooks/useGeolocation'; // ✅ 추가
 import styles from './MainPage.module.css';
 import type { Restaurant } from '../../types/restaurant';
 import RestaurantDetail from '../../components/RestaurantDetail';
@@ -14,6 +16,16 @@ function MainPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const { searchText, categories } = useSearchStore();
+
+  const { latitude, longitude, requestLocation, permissionStatus, hasLocation } = useGeolocation(false);
+  
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [hasAskedPermission, setHasAskedPermission] = useState(false);
+  
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number }>({
+    lat: 37.5665,
+    lng: 126.9780, // 서울 시청 기본값
+  });
 
   const fetchRestaurants = async () => {
     setLoading(true);
@@ -39,7 +51,53 @@ function MainPage() {
   };
 
   useEffect(() => {
+    const checkLocationPermission = async () => {
+      if (hasAskedPermission || permissionStatus === 'granted' || permissionStatus === 'denied') {
+        return;
+      }
+
+      const previouslyDenied = localStorage.getItem('locationPermissionDenied');
+      if (previouslyDenied) {
+        return;
+      }
+
+      if (permissionStatus === 'prompt' || permissionStatus === null) {
+        setTimeout(() => {
+          setShowLocationModal(true);
+        }, 500);
+      }
+    };
+
+    checkLocationPermission();
+  }, [permissionStatus, hasAskedPermission]);
+
+  useEffect(() => {
+    if (hasLocation && latitude && longitude) {
+      console.log('위치 정보 수신:', { latitude, longitude, hasLocation });
+      console.log('지도 중심 변경:', { lat: latitude, lng: longitude });
+      setMapCenter({ lat: latitude, lng: longitude });
+    } else {
+      console.log('위치 정보 대기 중...', { hasLocation, latitude, longitude });
+    }
+  }, [hasLocation, latitude, longitude]);
+
+  const handleAllowLocation = () => {
+    console.log('사용자가 위치 정보 제공 동의');
+    setShowLocationModal(false);
+    setHasAskedPermission(true);
+    requestLocation(); // 위치 요청 → useEffect가 감지하여 지도 이동
+  };
+
+  const handleDenyLocation = () => {
+    console.log('기본 위치(서울 시청) 사용');
+    setShowLocationModal(false);
+    setHasAskedPermission(true);
+    // 기본값 유지 (이미 서울 시청으로 설정됨)
+  };
+
+  useEffect(() => {
     fetchRestaurants();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -55,7 +113,7 @@ function MainPage() {
     setSelectedRestaurant(restaurant);
   };
 
-  const handleRestaurantClick = (restaurant: Restaurant) => { // ← 추가
+  const handleRestaurantClick = (restaurant: Restaurant) => {
     setSelectedRestaurant(restaurant);
   };
 
@@ -128,47 +186,52 @@ function MainPage() {
   }
 
   return (
-  <div className={styles.mainPage}>
-    <FilterPanel />
+    <div className={styles.mainPage}>
+      <FilterPanel />
 
-    <div className={styles.contentWrapper}>
-      {/* 검색어가 있을 때만 리스트 표시 */}
-      {searchText && (
-        <RestaurantListPanel 
-          restaurants={filteredRestaurants}
-          onRestaurantClick={handleRestaurantClick}
-        />
-      )}
+      <div className={styles.contentWrapper}>
+        {searchText && (
+          <RestaurantListPanel 
+            restaurants={filteredRestaurants}
+            onRestaurantClick={handleRestaurantClick}
+          />
+        )}
 
-      <div className={styles.mapWrapper}>
-        <Map
-          restaurants={filteredRestaurants}
-          center={{ lat: 37.5665, lng: 126.9780 }}
-          onMarkerClick={handleMarkerClick}
-        />
+        <div className={styles.mapWrapper}>
+          <Map
+            restaurants={filteredRestaurants}
+            center={mapCenter} 
+            onMarkerClick={handleMarkerClick}
+          />
 
-        <div className={styles.resultCount}>
-          {searchText || categories.length > 0 ? (
-            <>
-              <span className={styles.resultLabel}>검색 결과:</span>
-              <span className={styles.resultNumber}>{filteredRestaurants.length}</span>
-              <span className={styles.resultUnit}>개의 식당</span>
-            </>
-          ) : (
-            <>
-              <span className={styles.resultNumber}>{filteredRestaurants.length}</span>
-              <span className={styles.resultUnit}>개의 식당</span>
-            </>
-          )}
+          <div className={styles.resultCount}>
+            {searchText || categories.length > 0 ? (
+              <>
+                <span className={styles.resultLabel}>검색 결과:</span>
+                <span className={styles.resultNumber}>{filteredRestaurants.length}</span>
+                <span className={styles.resultUnit}>개의 식당</span>
+              </>
+            ) : (
+              <>
+                <span className={styles.resultNumber}>{filteredRestaurants.length}</span>
+                <span className={styles.resultUnit}>개의 식당</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
-    </div>
 
-    {selectedRestaurant && (
-      <RestaurantDetail restaurant={selectedRestaurant} onClose={handleCloseDetail} />
-    )}
-  </div>
-);
+      {selectedRestaurant && (
+        <RestaurantDetail restaurant={selectedRestaurant} onClose={handleCloseDetail} />
+      )}
+
+      <LocationPermissionModal
+        isOpen={showLocationModal}
+        onAllow={handleAllowLocation}
+        onDeny={handleDenyLocation}
+      />
+    </div>
+  );
 }
 
 export default MainPage;

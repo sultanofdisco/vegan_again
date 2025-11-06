@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './Map.module.css';
 import type { Restaurant } from '../types/restaurant';
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -13,36 +13,67 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
+  const [userMarker, setUserMarker] = useState<any>(null);
+  const isInitialized = useRef(false); 
 
-  // 지도 초기화
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    if (!mapContainerRef.current || isInitialized.current) return;
 
-    // 카카오맵 SDK 로드 대기
     window.kakao.maps.load(() => {
       const options = {
         center: new window.kakao.maps.LatLng(
-          center?.lat || 37.5665, // 기본값
+          center?.lat || 37.5665,
           center?.lng || 126.9780
         ),
-        level: 5,
+        level: 3,
       };
 
-      // 지도 생성
       const map = new window.kakao.maps.Map(mapContainerRef.current, options);
       mapRef.current = map;
+      isInitialized.current = true; 
+
     });
+  }, []); 
+
+  useEffect(() => {
+    if (!mapRef.current || !center || !isInitialized.current) return;
+
+    const moveLatLon = new window.kakao.maps.LatLng(center.lat, center.lng);
+    
+    mapRef.current.setCenter(moveLatLon);
+    mapRef.current.setLevel(3);
+    
+    if (userMarker) {
+      userMarker.setMap(null);
+    }
+
+    if (center.lat !== 37.5665 || center.lng !== 126.9780) {
+      const imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
+      const imageSize = new window.kakao.maps.Size(24, 35);
+      const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
+
+      const marker = new window.kakao.maps.Marker({
+        position: moveLatLon,
+        map: mapRef.current,
+        image: markerImage,
+        title: '내 위치',
+      });
+
+      setUserMarker(marker);
+      console.log('[Map] 사용자 위치 마커 표시');
+    }
+    
+    console.log('[Map] 지도 중심 이동 완료:', center, 'level: 3');
   }, [center]);
 
-  // 마커 표시
   useEffect(() => {
-    if (!mapRef.current || restaurants.length === 0) return;
+    if (!mapRef.current || restaurants.length === 0 || !isInitialized.current) return;
 
-    // 기존 마커 제거
+    console.log(`[Map] ${restaurants.length}개 마커 표시 시작...`);
+
     markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
 
-    // 새 마커 생성
     const newMarkers = restaurants.map(restaurant => {
       const markerPosition = new window.kakao.maps.LatLng(
         restaurant.location.lat,
@@ -56,7 +87,6 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
 
       marker.setMap(mapRef.current);
 
-      // 마커 클릭 이벤트
       if (onMarkerClick) {
         window.kakao.maps.event.addListener(marker, 'click', () => {
           onMarkerClick(restaurant);
@@ -67,19 +97,8 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
     });
 
     markersRef.current = newMarkers;
-
-    if (newMarkers.length > 0) {
-      const bounds = new window.kakao.maps.LatLngBounds();
-      restaurants.forEach(restaurant => {
-        bounds.extend(
-          new window.kakao.maps.LatLng(
-            restaurant.location.lat,
-            restaurant.location.lng
-          )
-        );
-      });
-      mapRef.current.setBounds(bounds);
-    }
+        
+    console.log(`[Map] ${newMarkers.length}개 마커 표시 완료`);
   }, [restaurants, onMarkerClick]);
 
   return <div ref={mapContainerRef} className={styles.mapContainer} />;

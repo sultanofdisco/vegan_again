@@ -20,9 +20,10 @@ interface Bookmark {
 interface BookmarksListProps {
   bookmarks: Bookmark[];
   onRemove: (bookmarkId: number) => void;
+  onClick?: (restaurantId: number) => void;
 }
 
-const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
+const BookmarksList = ({ bookmarks, onRemove, onClick }: BookmarksListProps) => {
   const navigate = useNavigate();
 
   const getCategoryIcon = (category: string): string => {
@@ -47,7 +48,10 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
   };
 
   const handleRestaurantClick = (restaurantId: number) => {
-    navigate(`/?restaurant=${restaurantId}`);
+    if (onClick) {
+      console.log('북마크 식당 클릭:', restaurantId);
+      onClick(restaurantId);
+    }
   };
 
   if (bookmarks.length === 0) {
@@ -80,6 +84,7 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
             <div 
               className={styles.cardContent}
               onClick={() => handleRestaurantClick(bookmark.restaurant.id)}
+              style={{ cursor: onClick ? 'pointer' : 'default' }}
             >
               <div className={styles.restaurantInfo}>
                 <div className={styles.categoryBadge}>

@@ -244,6 +244,11 @@ const MyPage = () => {
     }
   };
 
+  const handleBookmarkClick = (restaurantId: number) => {
+    console.log('북마크 클릭 - 식당 ID:', restaurantId);
+    navigate(`/?restaurantId=${restaurantId}`);
+  };
+
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
@@ -307,6 +312,7 @@ const MyPage = () => {
             <BookmarksList
               bookmarks={bookmarks}
               onRemove={handleRemoveBookmark}
+              onClick={handleBookmarkClick}
             />
           )}
           
