@@ -938,3 +938,221 @@ postgrest.exceptions.APIError: {'code': '42703', 'details': None, 'hint': None, 
 2025-11-07 01:59:43,167 - werkzeug - INFO -  * Restarting with stat
 2025-11-07 01:59:44,481 - werkzeug - WARNING -  * Debugger is active!
 2025-11-07 01:59:44,488 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:05:39,652 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 05:05:39,652 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 05:05:39,654 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:05:40,666 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:05:40,673 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:09:20,159 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:09:20] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:09:20,514 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:09:20] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:09:21,089 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:09:21] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:09:21,353 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:09:21] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:09:47,496 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 05:09:47,497 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 05:09:47,497 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:09:48,371 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:09:48,377 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:09:57,973 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:09:57] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:09:58,253 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:09:58] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:09:58,821 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:09:58] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:09:59,082 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:09:59] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:10:00,253 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:10:00] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:11:15,630 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 05:11:15,630 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 05:11:15,631 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:11:16,520 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:11:16,527 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:11:20,863 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:11:20] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:11:21,138 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:11:21] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:11:21,705 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:11:21] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:11:21,960 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:11:21] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:12:10,255 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:12:10] "GET / HTTP/1.1" 200 -
+2025-11-07 05:12:10,318 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:12:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-11-07 05:12:30,305 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:12:30] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:12:31,087 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:12:31] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:12:31,315 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:12:31] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:12:31,878 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:12:31] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:14:01,466 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 05:14:01,467 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 05:14:01,468 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:14:02,360 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:14:02,366 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:14:24,769 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:24] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:14:25,049 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:25] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:14:25,285 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:25] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:14:25,539 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:25] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:14:33,492 - root - ERROR - 검색 중 오류 발생: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+2025-11-07 05:14:33,493 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:33] "[35m[1mGET /api/search?keyword=강남&category= HTTP/1.1[0m" 500 -
+2025-11-07 05:14:35,155 - root - ERROR - 검색 중 오류 발생: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+2025-11-07 05:14:35,157 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:35] "[35m[1mGET /api/search?keyword=강남&category= HTTP/1.1[0m" 500 -
+2025-11-07 05:14:35,817 - root - ERROR - 검색 중 오류 발생: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+2025-11-07 05:14:35,818 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:35] "[35m[1mGET /api/search?keyword=강남&category= HTTP/1.1[0m" 500 -
+2025-11-07 05:14:39,089 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:39] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 05:14:39,117 - root - ERROR - 검색 중 오류 발생: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+2025-11-07 05:14:39,119 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:39] "[35m[1mGET /api/search?keyword=강남&category= HTTP/1.1[0m" 500 -
+2025-11-07 05:14:39,130 - root - ERROR - 검색 중 오류 발생: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+2025-11-07 05:14:39,132 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:39] "[35m[1mGET /api/search?keyword=강남&category= HTTP/1.1[0m" 500 -
+2025-11-07 05:14:39,144 - root - ERROR - 검색 중 오류 발생: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+2025-11-07 05:14:39,146 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:39] "[35m[1mGET /api/search?keyword=강남&category= HTTP/1.1[0m" 500 -
+2025-11-07 05:14:39,155 - root - ERROR - 검색 중 오류 발생: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+2025-11-07 05:14:39,157 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:39] "[35m[1mGET /api/search?keyword=강남&category= HTTP/1.1[0m" 500 -
+2025-11-07 05:14:41,152 - root - ERROR - 검색 중 오류 발생: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+2025-11-07 05:14:41,153 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:14:41] "[35m[1mGET /api/search?keyword=강남&category= HTTP/1.1[0m" 500 -
+2025-11-07 05:15:24,862 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\search.py', reloading
+2025-11-07 05:15:24,997 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:15:25,877 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:15:25,884 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:15:52,351 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\search.py', reloading
+2025-11-07 05:15:52,483 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:15:53,494 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:15:53,502 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:15:55,902 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\search.py', reloading
+2025-11-07 05:15:56,074 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:15:57,643 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:15:57,655 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:16:09,078 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 05:16:09,079 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 05:16:09,080 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:16:09,954 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:16:09,960 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:16:16,199 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:16:16] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:16:16,639 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:16:16] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:16:16,895 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:16:16] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:16:17,300 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:16:17] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:16:22,962 - root - ERROR - 검색 중 오류 발생: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+Traceback (most recent call last):
+  File "C:\Users\user\vegan_again\backend\app\routes\search.py", line 35, in search_restaurants
+    query = query.or_(f'name.ilike.%{keyword}%,address.ilike.%{keyword}%')
+            ^^^^^^^^^
+AttributeError: 'SyncSelectRequestBuilder' object has no attribute 'or_'
+2025-11-07 05:16:22,976 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:16:22] "[35m[1mGET /api/search?keyword=강남&category= HTTP/1.1[0m" 500 -
+2025-11-07 05:17:07,855 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\search.py', reloading
+2025-11-07 05:17:08,015 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:17:08,876 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:17:08,881 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:17:16,672 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\search.py', reloading
+2025-11-07 05:17:16,796 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:17:17,719 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:17:17,727 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:17:26,045 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\search.py', reloading
+2025-11-07 05:17:26,198 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:17:27,781 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:17:27,794 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:17:35,438 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 05:17:35,438 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 05:17:35,439 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 05:17:36,320 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 05:17:36,326 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 05:17:39,921 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:17:39] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:17:40,186 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:17:40] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:17:40,429 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:17:40] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:17:40,674 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:17:40] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:17:41,770 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:17:41] "GET /api/search?keyword=&category=일식 HTTP/1.1" 200 -
+2025-11-07 05:18:00,725 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:00] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 05:18:00,973 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:00] "GET /api/search?keyword=&category=일식 HTTP/1.1" 200 -
+2025-11-07 05:18:01,204 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:01] "GET /api/search?keyword=&category=일식 HTTP/1.1" 200 -
+2025-11-07 05:18:01,426 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:01] "GET /api/search?keyword=&category=일식 HTTP/1.1" 200 -
+2025-11-07 05:18:01,646 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:01] "GET /api/search?keyword=&category=일식 HTTP/1.1" 200 -
+2025-11-07 05:18:07,987 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:07] "GET /api/search?keyword=강남&category=일식 HTTP/1.1" 200 -
+2025-11-07 05:18:13,858 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:13] "GET /api/search?keyword=&category=일식 HTTP/1.1" 200 -
+2025-11-07 05:18:20,032 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:20] "GET /api/search?keyword=점점점&category=일식 HTTP/1.1" 200 -
+2025-11-07 05:18:24,308 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:24] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:18:25,738 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:25] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:18:25,959 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:25] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:18:39,726 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:39] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:18:39,953 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:39] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:18:39,995 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:39] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:18:40,212 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:40] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:18:40,655 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:40] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:18:41,292 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:41] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:18:45,508 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:45] "DELETE /api/reviews/4 HTTP/1.1" 200 -
+2025-11-07 05:18:46,151 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:46] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:18:54,035 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:54] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:18:54,681 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:54] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:18:55,318 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:55] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:18:55,970 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:18:55] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:19:47,453 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:19:47] "POST /api/auth/logout HTTP/1.1" 200 -
+2025-11-07 05:20:19,048 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:19] "[31m[1mPOST /api/auth/signup HTTP/1.1[0m" 409 -
+2025-11-07 05:20:20,800 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:20] "[31m[1mPOST /api/auth/signup HTTP/1.1[0m" 409 -
+2025-11-07 05:20:28,695 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:28] "[35m[1mPOST /api/auth/signup HTTP/1.1[0m" 201 -
+2025-11-07 05:20:33,865 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:33] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 05:20:34,528 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:34] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:20:35,162 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:35] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:20:35,791 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:35] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:20:36,415 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:36] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:20:38,964 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:38] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:20:39,191 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:39] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:20:39,228 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:39] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:20:39,447 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:39] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:20:39,861 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:39] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:20:40,495 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:40] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:20:59,565 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:20:59] "PUT /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:21:05,169 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:05] "DELETE /api/users/bookmarks/100 HTTP/1.1" 200 -
+2025-11-07 05:21:05,479 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:05] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:21:10,625 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:10] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:21:11,412 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:11] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:21:12,189 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:12] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:21:13,005 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:13] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:21:16,044 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:16] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:21:16,345 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:16] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:21:16,381 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:16] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:21:16,621 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:16] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:21:17,066 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:17] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:21:17,706 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:17] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:21:21,828 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:21] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:21:22,504 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:22] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:21:23,207 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:23] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:21:23,864 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:23] "GET /api/search?keyword=점점점&category= HTTP/1.1" 200 -
+2025-11-07 05:21:25,108 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:25] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:25,344 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:25] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:25,576 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:25] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:25,802 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:25] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:28,522 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:28] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 05:21:28,760 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:28] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:28,997 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:28] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:29,229 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:29] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:29,460 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:29] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:30,531 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:30] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:21:30,752 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:30] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:21:33,077 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:33] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:21:33,311 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:33] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:21:33,350 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:33] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:21:33,574 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:33] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:21:33,990 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:33] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:21:34,632 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:34] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:21:37,016 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:37,241 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:37,469 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:37,699 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:21:42,866 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:42] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:21:43,086 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:21:43] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:22:14,011 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:14] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:22:14,288 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:14] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:22:14,604 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:14] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:22:14,830 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:14] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:22:14,943 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:14] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:22:15,564 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:15] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:22:21,741 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:21] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:22:21,962 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:21] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:22:22,181 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:22] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:22:22,405 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:22:22] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:23:14,384 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:14] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:23:14,641 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:14] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:23:17,470 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:17] "[35m[1mPOST /api/users/bookmarks/57 HTTP/1.1[0m" 201 -
+2025-11-07 05:23:17,700 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:17] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:23:21,338 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:21] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:23:21,611 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:21] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:23:21,917 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:21] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 05:23:22,160 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:22] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 05:23:22,298 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:22] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:23:22,971 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:22] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 05:23:37,199 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:23:37,450 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:23:37,699 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -
+2025-11-07 05:23:37,951 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 05:23:37] "GET /api/search?keyword=&category= HTTP/1.1" 200 -

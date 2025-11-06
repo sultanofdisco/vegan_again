@@ -1,4 +1,3 @@
-// src/components/ReviewList.tsx
 import { useState, type MouseEvent } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import type { Review } from '../types/review';
@@ -34,7 +33,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
     setVisibleCount(prev => prev + 3);
   };
 
-  // ✅ 수정: 단일 이미지 선택
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     
@@ -45,7 +43,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
       return;
     }
 
-    // 기존 미리보기 URL 해제
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
@@ -54,7 +51,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
     setPreviewUrl(URL.createObjectURL(file));
   };
 
-  // ✅ 수정: 이미지 제거
   const handleRemoveImage = () => {
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
@@ -63,7 +59,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
     setPreviewUrl('');
   };
 
-  // ✅ 수정: 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -104,7 +99,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
     }
   };
 
-  // 로그인 버튼 클릭 핸들러 (페이지 이동 로직 포함)
   const handleLoginClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); 
 
@@ -116,7 +110,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
 
   return (
     <div className={styles.container}>
-      {/* 리뷰 목록 */}
       {reviews.length === 0 ? (
         <div className={styles.empty}>
           <p>아직 작성된 리뷰가 없습니다.</p>
@@ -127,7 +120,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
           <div className={styles.reviewList}>
             {visibleReviews.map((review) => (
               <div key={review.id} className={styles.reviewItem}>
-                {/* 리뷰 헤더 */}
                 <div className={styles.reviewHeader}>
                   <div className={styles.userInfo}>
                     {review.userProfileImage ? (
@@ -155,7 +147,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
                   )}
                 </div>
 
-                {/* ✅ 수정: 단일 이미지만 표시 */}
                 {review.images && review.images.length > 0 && (
                   <div className={styles.images}>
                     <img
@@ -166,13 +157,11 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
                   </div>
                 )}
 
-                {/* 리뷰 내용 */}
                 <p className={styles.content}>{review.content}</p>
               </div>
             ))}
           </div>
 
-          {/* 더보기 버튼 */}
           {hasMore && (
             <button 
               className={styles.loadMoreButton}
@@ -184,12 +173,10 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
         </>
       )}
 
-      {/* 리뷰 작성 폼 */}
       {isLoggedIn ? (
         <form className={styles.reviewForm} onSubmit={handleSubmit}>
           <h3 className={styles.formTitle}>리뷰 작성하기</h3>
           
-          {/* 별점 선택 */}
           <div className={styles.ratingSection}>
             <div className={styles.stars}>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -213,7 +200,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
             </div>
           </div>
 
-          {/* ✅ 수정: 단일 이미지 업로드 */}
           <div className={styles.imageUploadSection}>
             <label htmlFor="imageUpload" className={styles.imageUploadLabel}>
               <span>사진 추가</span>
@@ -225,10 +211,9 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
               accept="image/*"
               onChange={handleImageSelect}
               className={styles.imageUploadInput}
-              disabled={!!selectedImage}  // ✅ 이미 선택되면 비활성화
+              disabled={!!selectedImage} 
             />
             
-            {/* ✅ 수정: 단일 이미지 미리보기 */}
             {previewUrl && (
               <div className={styles.imagePreviews}>
                 <div className={styles.imagePreview}>
@@ -245,7 +230,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
             )}
           </div>
 
-          {/* 텍스트 입력 */}
           <div className={styles.textInputSection}>
             <textarea
               value={reviewContent}
@@ -260,7 +244,6 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
             </div>
           </div>
 
-          {/* 제출 버튼 */}
           <button
             type="submit"
             className={styles.submitButton}

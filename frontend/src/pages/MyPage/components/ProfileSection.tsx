@@ -1,5 +1,5 @@
-// src/pages/MyPage/components/ProfileSection.tsx
 import { useState, useEffect, useRef } from 'react';
+import { supabase } from '../../../lib/supabase';
 import styles from './ProfileSection.module.css';
 
 interface UserProfile {
@@ -65,25 +65,36 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
 
     setUploading(true);
     try {
-      // File을 Base64로 변환
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        try {
-          const base64String = reader.result as string;
-          await onUpdate({ profile_image_url: base64String });
-          alert('프로필 이미지가 변경되었습니다.');
-        } catch (error) {
-          console.error('이미지 업로드 실패:', error);
-          alert('이미지 업로드에 실패했습니다.');
-        } finally {
-          setUploading(false);
+      // 기존 이미지가 있으면 삭제
+      if (profile.profile_image_url) {
+        const oldPath = profile.profile_image_url.split('/').pop();
+        if (oldPath) {
+          await supabase.storage
+            .from('profile-images')
+            .remove([`${profile.user_id}/${oldPath}`]);
         }
-      };
-      reader.onerror = () => {
-        alert('파일 읽기에 실패했습니다.');
-        setUploading(false);
-      };
-      reader.readAsDataURL(file);
+      }
+
+      // 새 이미지 업로드
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const filePath = `${profile.user_id}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('profile-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(filePath);
+
+      await onUpdate({ profile_image_url: urlData.publicUrl });
+      alert('프로필 이미지가 변경되었습니다.');
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
       alert('이미지 업로드에 실패했습니다.');

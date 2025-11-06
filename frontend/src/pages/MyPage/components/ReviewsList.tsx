@@ -1,4 +1,3 @@
-// src/pages/MyPage/components/ReviewsList.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ReviewsList.module.css';
@@ -126,7 +125,6 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
       <div className={styles.list}>
         {reviews.map((review) => (
           <div key={review.id} className={styles.card}>
-            {/* 식당 정보 */}
             <div 
               className={styles.restaurantInfo}
               onClick={() => handleRestaurantClick(review.restaurantId)}
@@ -136,7 +134,6 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
               </div>
             </div>
 
-            {/* 리뷰 내용 */}
             <div className={styles.reviewContent}>
               {/* 평점 */}
               {review.rating && (
@@ -145,7 +142,6 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
                 </div>
               )}
 
-              {/* 리뷰 텍스트 */}
               {editingId === review.id ? (
                 <div className={styles.editForm}>
                   <textarea
@@ -191,7 +187,6 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
               )}
             </div>
 
-            {/* 메타 정보 및 액션 버튼 */}
             <div className={styles.footer}>
               <span className={styles.date}>
                 {getDisplayDate(review)}
@@ -202,13 +197,13 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
                     onClick={() => handleEdit(review)}
                     className={styles.editButton}
                   >
-                    ✏️ 수정
+                    수정
                   </button>
                   <button 
                     onClick={() => onDelete(review.id)}
                     className={styles.deleteButton}
                   >
-                    🗑️ 삭제
+                    삭제
                   </button>
                 </div>
               )}

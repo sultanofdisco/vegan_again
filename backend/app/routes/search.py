@@ -26,18 +26,43 @@ def search_restaurants():
                 "error": "검색어는 최소 2글자 이상 입력해주세요."
             }), 400
 
-        query = supabase.table('restaurants').select('*')
-
+        # 키워드 검색 (빈 문자열이 아닐 때만)
+        # Supabase Python 클라이언트는 or_() 메서드가 없으므로
+        # 두 조건을 각각 검색하고 결과를 합치는 방식 사용
+        keyword_ids = None
         if keyword:
-            query = query.or_(
-                f'name.ilike.%{keyword}%,'
-                f'address.ilike.%{keyword}%'
-            )
+            # name 또는 address에 키워드가 포함된 경우를 찾기 위해
+            # 두 개의 쿼리를 실행하고 결과를 합침
+            name_query = supabase.table('restaurants').select('restaurant_id').ilike('name', f'%{keyword}%')
+            address_query = supabase.table('restaurants').select('restaurant_id').ilike('address', f'%{keyword}%')
+            
+            name_result = name_query.execute()
+            address_result = address_query.execute()
+            
+            # 두 결과를 합치고 중복 제거 (restaurant_id 기준)
+            name_ids = {item.get('restaurant_id') for item in (name_result.data or [])}
+            address_ids = {item.get('restaurant_id') for item in (address_result.data or [])}
+            keyword_ids = name_ids.union(address_ids)
+            
+            if not keyword_ids:
+                # 키워드 검색 결과가 없으면 빈 결과 반환
+                return jsonify({
+                    "success": True,
+                    "count": 0,
+                    "data": []
+                }), 200
+
+        # 쿼리 시작
+        query = supabase.table('restaurants').select('*')
+        
+        # 키워드 필터링 적용
+        if keyword_ids:
+            query = query.in_('restaurant_id', list(keyword_ids))
 
         # 카테고리 필터링 (다중 선택 지원)
         if category:
             # 쉼표로 구분된 카테고리 처리 (예: "한식,일식")
-            categories = [c.strip() for c in category.split(',')]
+            categories = [c.strip() for c in category.split(',') if c.strip()]
 
             # 화이트리스트 검증
             allowed_categories = ['한식', '양식', '중식', '일식', '카페', '기타']
@@ -65,10 +90,10 @@ def search_restaurants():
         }), 200
 
     except Exception as e:
-        logging.error(f"검색 중 오류 발생: {str(e)}")
+        logging.error(f"검색 중 오류 발생: {str(e)}", exc_info=True)
         return jsonify({
             "success": False,
-            "error": "검색 중 오류가 발생했습니다."
+            "error": f"검색 중 오류가 발생했습니다: {str(e)}"
         }), 500
 
 

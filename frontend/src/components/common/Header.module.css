@@ -17,7 +17,6 @@
   gap: 24px;
 }
 
-/* 로고 */
 .logo {
   margin: 0;
   font-size: 30px;
@@ -40,16 +39,13 @@
   color: #1B5E20;
 }
 
-/* 검색 섹션 */
 .searchSection {
   flex: 1;
   max-width: 420px;
-  /* 👈 600px → 420px로 축소 */
   display: flex;
   align-items: center;
 }
 
-/* 검색바 래퍼 */
 .searchWrapper {
   width: 100%;
   position: relative;
@@ -57,19 +53,14 @@
   align-items: center;
   background: white;
   border: 2px solid #e0e0e0;
-  /* 👈 border 두께 증가 */
   border-radius: 24px;
   transition: all 0.3s ease;
   height: 46px;
-  /* 👈 고정 높이 */
 }
 
-/* 검색 중 상태 스타일 */
 .searchWrapper.searching {
   border-color: #2E7D32;
-  /* 👈 초록 테두리 */
   background: #F1F8F4;
-  /* 👈 연한 초록 배경 */
   box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
 }
 
@@ -84,10 +75,8 @@
 
 .searchWrapper.searching .searchIcon {
   color: #2E7D32;
-  /* 👈 검색 중일 때 아이콘 색상 */
 }
 
-/* 일반 입력창 */
 .searchInput {
   width: 100%;
   padding: 10px 44px 10px 44px;
@@ -102,10 +91,8 @@
 .searchInput::placeholder {
   color: #999;
   font-size: 13px;
-  /* 👈 placeholder 작게 */
 }
 
-/* 검색 중 표시 영역 */
 .searchingDisplay {
   flex: 1;
   display: flex;
@@ -137,7 +124,6 @@
   }
 }
 
-/* 클리어 버튼 */
 .clearButton {
   position: absolute;
   right: 12px;
@@ -170,7 +156,6 @@
   background-color: rgba(46, 125, 50, 0.15);
 }
 
-/* 네비게이션 */
 .nav {
   display: flex;
   align-items: center;
@@ -240,7 +225,6 @@
 @media (max-width: 1024px) {
   .searchSection {
     max-width: 340px;
-    /* 👈 더 축소 */
   }
 }
 

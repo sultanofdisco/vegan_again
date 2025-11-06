@@ -1,4 +1,3 @@
-// Header.tsx
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useUserStore } from '../../stores/useUserStore';
 import apiClient from '../../lib/axios';
@@ -13,8 +12,8 @@ const Header = () => {
   const location = useLocation();
   const { searchText, setSearchText } = useSearchStore();
   
-  const [inputValue, setInputValue] = useState(''); // 입력 중인 임시 검색어
-  const [isSearching, setIsSearching] = useState(false); // 검색 중 상태
+  const [inputValue, setInputValue] = useState('');
+  const [isSearching, setIsSearching] = useState(false); 
   const inputRef = useRef<HTMLInputElement>(null);
 
   const hideSearchBar = location.pathname === '/mypage';
@@ -41,15 +40,14 @@ const Header = () => {
     }
   };
 
-  // Enter 키로 검색 실행
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       const trimmed = inputValue.trim();
       
       if (trimmed) {
-        setSearchText(trimmed); // 실제 검색어 저장
-        setIsSearching(true); // 검색 중 상태로 변경
+        setSearchText(trimmed); 
+        setIsSearching(true);
         inputRef.current?.blur();
       }
     }
@@ -63,7 +61,6 @@ const Header = () => {
     inputRef.current?.focus();
   };
 
-  // 검색 중일 때와 아닐 때 다른 UI
   const showSearchingState = isSearching && searchText;
 
   return (
@@ -79,7 +76,6 @@ const Header = () => {
               <span className={styles.searchIcon}>🔍</span>
               
               {showSearchingState ? (
-                // 검색 중 상태
                 <>
                   <div className={styles.searchingDisplay}>
                     <span className={styles.searchTerm}>"{searchText}"</span>
@@ -93,7 +89,6 @@ const Header = () => {
                   </button>
                 </>
               ) : (
-                // 일반 상태
                 <>
                   <input
                     ref={inputRef}
