@@ -1,4 +1,3 @@
-// src/components/RestaurantDetail.tsx
 import { useState, useEffect } from 'react';
 import MenuList from './MenuList';
 import ReviewList from './ReviewList';
@@ -28,19 +27,13 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
     const [menus, setMenus] = useState<Menu[]>([]);
     const [menusLoading, setMenusLoading] = useState(true);
 
-    console.log('🔍 [RestaurantDetail] restaurant 전체:', restaurant);
-    console.log('🔍 [RestaurantDetail] restaurant.id:', restaurant.id, typeof restaurant.id);
-
     const restaurantId = restaurant.id;
 
-    // ✅ 메뉴 불러오기 함수 (snake_case → camelCase 변환!)
     const fetchMenus = async (restaurantIdNum: number | string) => {
         setMenusLoading(true);
         try {
             let queryValue: number | string = restaurantIdNum;
-            
-            console.log('🍽️ [fetchMenus] 원본 restaurant_id:', restaurantIdNum, typeof restaurantIdNum);
-            
+                        
             if (typeof restaurantIdNum === 'string') {
                 if (restaurantIdNum.includes('rest-')) {
                     queryValue = parseInt(restaurantIdNum.replace('rest-', ''));
@@ -49,15 +42,12 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
                 }
                 
                 if (isNaN(queryValue as number)) {
-                    console.error('❌ restaurant_id 변환 실패:', restaurantIdNum);
                     setMenus([]);
                     setMenusLoading(false);
                     return;
                 }
             }
-            
-            console.log('🍽️ [fetchMenus] 변환된 restaurant_id:', queryValue, typeof queryValue);
-            
+                        
             const { data, error } = await supabase
                 .from('menus')
                 .select(`
@@ -65,6 +55,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
                     restaurant_id,
                     menu_name,
                     price,
+                    description,
                     vegetarian_level,
                     confidence_score,
                     ingredients,
@@ -74,28 +65,22 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
                 `)
                 .eq('restaurant_id', queryValue);
 
-            console.log('🍽️ [fetchMenus] 메뉴 원본 데이터:', data);
-            console.log('🍽️ [fetchMenus] 메뉴 에러:', error);
-
             if (error) throw error;
             
-            // ✅ snake_case를 camelCase로 변환
             const formattedMenus: Menu[] = (data || []).map(menu => ({
                 id: menu.menu_id,
                 name: menu.menu_name,
                 price: menu.price,
-                description: menu.ingredients, // ingredients를 description으로 사용
+                description: menu.description, // ingredients를 description으로 사용
                 vegetarianLevel: menu.vegetarian_level,
                 confidenceScore: menu.confidence_score,
                 analyzedAt: menu.analyzed_at,
             }));
-
-            console.log('🍽️ [fetchMenus] 변환된 메뉴:', formattedMenus);
             
             setMenus(formattedMenus);
             
         } catch (error) {
-            console.error('❌ [Fetch Menus Failed]:', error);
+            console.error('[Fetch Menus Failed]:', error);
             setMenus([]);
         } finally {
             setMenusLoading(false);
@@ -107,9 +92,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
         setReviewsLoading(true);
         try {
             let queryValue: number | string = restaurantIdNum;
-            
-            console.log('🔍 [fetchReviews] 원본 restaurant_id:', restaurantIdNum, typeof restaurantIdNum);
-            
+                        
             if (typeof restaurantIdNum === 'string') {
                 if (restaurantIdNum.includes('rest-')) {
                     queryValue = parseInt(restaurantIdNum.replace('rest-', ''));
@@ -118,15 +101,12 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
                 }
                 
                 if (isNaN(queryValue as number)) {
-                    console.error('❌ restaurant_id 변환 실패:', restaurantIdNum);
                     setReviews([]);
                     setReviewsLoading(false);
                     return;
                 }
             }
-            
-            console.log('🔍 [fetchReviews] 변환된 restaurant_id:', queryValue, typeof queryValue);
-            
+                        
             const { data: reviewsData, error: reviewsError } = await supabase
                 .from('reviews')
                 .select('review_id, rating, content, created_at, updated_at, image_url, user_id')
@@ -148,7 +128,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
                 .in('user_id', userIds);
 
             if (usersError) {
-                console.warn('⚠️ [Users Fetch Warning]:', usersError);
+                console.warn('[Users Fetch Warning]:', usersError);
             }
 
             const usersMap = new Map(
@@ -305,7 +285,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
         const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
         if (file.size > MAX_FILE_SIZE) {
-            console.error(`❌ 파일이 너무 큽니다: ${file.name}`);
+            console.error(`파일이 너무 큽니다: ${file.name}`);
             alert(`${file.name}은(는) 5MB를 초과합니다.`);
             return null;
         }
@@ -330,7 +310,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
             return data.publicUrl;
 
         } catch (error) {
-            console.error('❌ [Image Upload Error]:', error);
+            console.error('[Image Upload Error]:', error);
             return null;
         }
     };
@@ -345,13 +325,13 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
             let imageUrl: string | null = null;
 
             if (image) {
-                console.log('📝 [Submit Review] 이미지 업로드 시작...');
+                console.log('[Submit Review] 이미지 업로드 시작...');
                 imageUrl = await uploadImage(image, user.id);
                 
                 if (imageUrl) {
-                    console.log('✅ [Image Upload Success]:', imageUrl);
+                    console.log('[Image Upload Success]:', imageUrl);
                 } else {
-                    console.warn('⚠️ [Image Upload Failed]');
+                    console.warn('[Image Upload Failed]');
                 }
             }
 
@@ -370,15 +350,13 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
             await fetchReviews(restaurantId);
 
         } catch (error) {
-            console.error('❌ [Submit Review Error]:', error);
+            console.error('[Submit Review Error]:', error);
             alert('리뷰 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
             throw error;
         }
     };
 
-    useEffect(() => {
-        console.log('🔍 [useEffect] restaurantId:', restaurantId, typeof restaurantId);
-        
+    useEffect(() => {        
         if (user) {
             checkBookmarkStatus();
         }

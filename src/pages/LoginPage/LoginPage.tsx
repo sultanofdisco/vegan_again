@@ -5,7 +5,7 @@ import styles from './LoginPage.module.css';
 import { supabase } from '../../lib/supabase';
 
 const LoginPage = () => {
-  // State 선언
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -126,10 +126,8 @@ const LoginPage = () => {
     }
   };
 
-  // 렌더링
   return (
     <>
-      {/* 간소화된 헤더 */}
       <header className={styles.simpleHeader}>
         <div className={styles.headerContainer}>
           <button 
@@ -187,12 +185,10 @@ const LoginPage = () => {
           </button>
         </form>
 
-        {/* 구분선 */}
         <div className={styles.divider}>
           <span>또는</span>
         </div>
 
-        {/* 소셜 로그인 버튼들 */}
         <div className={styles.socialButtons}>
           <button
             type="button"

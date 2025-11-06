@@ -1,4 +1,3 @@
-// src/pages/MyPage/components/ReviewsList.tsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ReviewsList.module.css';
@@ -49,8 +48,7 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
       '일식': '🍱',
       '양식': '🍝',
       '카페': '☕',
-      '분식': '🍜',
-      '디저트': '🍰',
+      '기타': '🔗',
     };
     return categoryMap[category] || '🍽️';
   };
@@ -110,7 +108,6 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
       <div className={styles.list}>
         {reviews.map((review) => (
           <div key={review.id} className={styles.card}>
-            {/* 식당 정보 */}
             <div 
               className={styles.restaurantInfo}
               onClick={() => handleRestaurantClick(review.restaurant.id)}
@@ -124,16 +121,13 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
               <p className={styles.address}>📍 {review.restaurant.address}</p>
             </div>
 
-            {/* 리뷰 내용 */}
             <div className={styles.reviewContent}>
-              {/* 평점 - 기획서에는 없지만 기존 DB 구조에 있어서 포함 */}
               {review.rating && (
                 <div className={styles.rating}>
                   {'⭐'.repeat(review.rating)}
                 </div>
               )}
 
-              {/* 리뷰 텍스트 */}
               {editingId === review.id ? (
                 <div className={styles.editForm}>
                   <textarea
@@ -164,7 +158,6 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
                 <p className={styles.content}>{review.content}</p>
               )}
 
-              {/* 리뷰 이미지 */}
               {review.image_url && (
                 <div className={styles.imageWrapper}>
                   <img 
@@ -176,7 +169,6 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
               )}
             </div>
 
-            {/* 메타 정보 및 액션 버튼 */}
             <div className={styles.footer}>
               <span className={styles.date}>{formatDate(review.created_at)}</span>
               {editingId !== review.id && (
@@ -185,13 +177,13 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
                     onClick={() => handleEdit(review)}
                     className={styles.editButton}
                   >
-                    ✏️ 수정
+                    수정
                   </button>
                   <button 
                     onClick={() => onDelete(review.id)}
                     className={styles.deleteButton}
                   >
-                    🗑️ 삭제
+                    삭제
                   </button>
                 </div>
               )}

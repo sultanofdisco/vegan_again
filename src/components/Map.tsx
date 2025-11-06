@@ -22,10 +22,10 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
     window.kakao.maps.load(() => {
       const options = {
         center: new window.kakao.maps.LatLng(
-          center?.lat || 37.5665, // 기본값: 서울시청
+          center?.lat || 37.5665, // 기본값
           center?.lng || 126.9780
         ),
-        level: 5, // 확대 레벨
+        level: 5,
       };
 
       // 지도 생성
@@ -68,7 +68,6 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
 
     markersRef.current = newMarkers;
 
-    // 지도 범위를 마커들이 모두 보이도록 조정
     if (newMarkers.length > 0) {
       const bounds = new window.kakao.maps.LatLngBounds();
       restaurants.forEach(restaurant => {

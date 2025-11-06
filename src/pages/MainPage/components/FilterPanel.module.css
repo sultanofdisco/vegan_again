@@ -5,10 +5,8 @@
   z-index: 10;
 }
 
-/* 필터 내용 */
 .filterContent {
   padding: 20px 40px;
-  /* 좌우 패딩 증가 */
   background-color: #fafafa;
   border-top: 1px solid #e0e0e0;
 }
@@ -26,9 +24,7 @@
   margin: 0;
   margin-right: 10px;
   margin-left: 10px;
-  /* 오른쪽 여백 추가 */
   white-space: nowrap;
-  /* 줄바꿈 방지 */
 }
 
 .resetButton {
@@ -42,9 +38,7 @@
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
-  /* 줄바꿈 방지 */
   margin-left: auto;
-  /* 오른쪽 끝으로 */
 }
 
 .resetButton:hover {
@@ -90,7 +84,6 @@
   border-color: #1B5E20;
 }
 
-/* 반응형 */
 @media (max-width: 768px) {
   .filterContent {
     padding: 16px 20px;

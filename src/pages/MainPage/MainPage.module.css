@@ -1,17 +1,25 @@
 .mainPage {
+  position: fixed;
   width: 100%;
-  height: 100%;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
+.contentWrapper {
+  flex: 1;
+  display: flex;
+  overflow: visible;
+  min-height: 0;
+  padding-bottom: 40px;
+}
+
 .mapWrapper {
   flex: 1;
-  /* 남은 공간 모두 차지 */
-  width: 100%;
   position: relative;
   overflow: hidden;
+  min-width: 0;
 }
 
 .resultCount {
@@ -46,7 +54,6 @@
   font-weight: 500;
 }
 
-/* 검색 중일 때 애니메이션 */
 @keyframes pulse {
 
   0%,
@@ -62,4 +69,3 @@
 .resultCount.searching {
   animation: pulse 1s infinite;
 }
-

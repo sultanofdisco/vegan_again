@@ -1,4 +1,3 @@
-// src/pages/MyPage/components/ProfileSection.tsx
 import { useState, useRef } from 'react';
 import { supabase } from '../../../lib/supabase';
 import styles from './ProfileSection.module.css';
@@ -60,7 +59,6 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
 
     setUploading(true);
     try {
-      // 기존 이미지가 있으면 삭제
       if (profile.profile_image_url) {
         const oldPath = profile.profile_image_url.split('/').pop();
         if (oldPath) {
@@ -81,7 +79,6 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
 
       if (uploadError) throw uploadError;
 
-      // Public URL 가져오기
       const { data: urlData } = supabase.storage
         .from('profile-images')
         .getPublicUrl(filePath);

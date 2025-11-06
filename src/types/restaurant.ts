@@ -1,12 +1,6 @@
-// src/types/restaurant.ts
 import type { FoodCategory, VegetarianLevel, Location } from "./common";
 import type { Menu } from "./menu";
 
-// ============================================
-// 📦 DB 스키마 타입 (snake_case)
-// ============================================
-
-/** DB restaurants 테이블 스키마 */
 export interface RestaurantSchema {
   restaurant_id: number;
   name: string;
@@ -21,7 +15,6 @@ export interface RestaurantSchema {
   updated_at: string;
 }
 
-/** DB에 삽입할 식당 데이터 */
 export interface RestaurantInsert {
   name: string;
   address: string;
@@ -33,7 +26,6 @@ export interface RestaurantInsert {
   data_source?: string | null;
 }
 
-/** DB에서 업데이트할 식당 데이터 */
 export interface RestaurantUpdate {
   name?: string;
   address?: string;
@@ -46,65 +38,46 @@ export interface RestaurantUpdate {
   updated_at?: string;
 }
 
-// ============================================
-// 🎨 프론트엔드 UI 타입 (camelCase)
-// ============================================
-
-/** UI에서 사용하는 식당 타입 */
 export interface Restaurant {
-  id: number;                          // ✅ string → number
+  id: number;                          
   name: string;
   address: string;
-  location: Location;                  // ✅ latitude, longitude를 Location으로 변환
+  location: Location;              
   phone?: string;
-  category: FoodCategory;              // ✅ string → FoodCategory
+  category: FoodCategory;        
   
-  // 영업 시간
-  openingHours?: string;               // business_hours → openingHours
-  closedDays?: string[];               // ⚠️ ERD에 없음 (파싱 필요)
+  openingHours?: string;           
+  closedDays?: string[];        
   
-  // 메뉴 정보 (조인 필요)
   menus: Menu[];
   
-  // 식당에서 제공하는 채식 단계 (menus에서 계산)
   availableLevels: VegetarianLevel[];
   
-  // 평점 및 리뷰 (reviews 테이블에서 계산)
   rating?: number;
   reviewCount: number;
   
-  // 이미지 (⚠️ ERD에 없음 - 추후 추가 고려)
   imageUrls?: string[];
   thumbnailUrl?: string;
   
-  // 메타 정보
-  dataSource?: string;                 // 데이터 출처
+  dataSource?: string;               
   createdAt: string;
   updatedAt: string;
   
-  // 즐겨찾기 여부 (bookmarks 테이블에서 확인)
   isBookmarked?: boolean;
 }
 
-// ============================================
-// 📝 API 요청/응답 타입
-// ============================================
-
-/** 식당 목록 조회 필터 */
 export interface RestaurantFilter {
   category?: FoodCategory;
   vegetarianLevel?: VegetarianLevel;
   searchText?: string;
   region?: string;
   
-  // 지도 범위로 필터링
   bounds?: {
-    sw: Location;  // 남서쪽 좌표
-    ne: Location;  // 북동쪽 좌표
+    sw: Location;  
+    ne: Location;  
   };
 }
 
-/** 식당 목록 응답 */
 export interface RestaurantListResponse {
   restaurants: Restaurant[];
   total: number;
@@ -112,7 +85,6 @@ export interface RestaurantListResponse {
   pageSize?: number;
 }
 
-/** 식당 상세 정보 */
 export interface RestaurantDetail extends Restaurant {
   facilities?: string[];
   priceRange?: string;
@@ -120,7 +92,6 @@ export interface RestaurantDetail extends Restaurant {
   instagramUrl?: string;
 }
 
-/** 식당 생성 요청 */
 export interface CreateRestaurantRequest {
   name: string;
   address: string;
@@ -132,11 +103,6 @@ export interface CreateRestaurantRequest {
   dataSource?: string;
 }
 
-// ============================================
-// 🔄 타입 변환 유틸리티
-// ============================================
-
-/** DB 스키마 → UI 타입 변환 */
 export function restaurantSchemaToRestaurant(
   schema: RestaurantSchema,
   menus: Menu[] = [],
@@ -161,7 +127,7 @@ export function restaurantSchemaToRestaurant(
   else if (['일식', 'japanese'].some(k => categoryLower.includes(k))) category = 'japanese';
   else if (['양식', 'western'].some(k => categoryLower.includes(k))) category = 'western';
   else if (['카페', 'cafe'].some(k => categoryLower.includes(k))) category = 'cafe';
-  else if (['디저트', 'dessert'].some(k => categoryLower.includes(k))) category = 'dessert';
+  else if (['기타', 'etc'].some(k => categoryLower.includes(k))) category = 'etc';
 
   return {
     id: schema.restaurant_id,
@@ -217,10 +183,6 @@ export function restaurantToUpdate(restaurant: Partial<CreateRestaurantRequest>)
   return update;
 }
 
-// ============================================
-// 🗺️ 카카오맵 API 타입
-// ============================================
-
 /** 카카오맵 API에서 받아온 원본 데이터 */
 export interface KakaoMapPlaceData {
   id: string;
@@ -234,7 +196,6 @@ export interface KakaoMapPlaceData {
   category_name?: string;
 }
 
-/** 카카오맵 데이터 → RestaurantInsert 변환 */
 export function kakaoMapToRestaurantInsert(
   kakaoData: KakaoMapPlaceData,
   category: FoodCategory = 'etc'
@@ -251,14 +212,6 @@ export function kakaoMapToRestaurantInsert(
   };
 }
 
-// ============================================
-// 📍 위치 관련 유틸리티
-// ============================================
-
-/**
- * 두 좌표 사이의 거리 계산 (단위: km)
- * Haversine 공식 사용
- */
 export function calculateDistance(loc1: Location, loc2: Location): number {
   const R = 6371; // 지구 반지름 (km)
   const dLat = (loc2.lat - loc1.lat) * Math.PI / 180;
@@ -273,9 +226,6 @@ export function calculateDistance(loc1: Location, loc2: Location): number {
   return R * c;
 }
 
-/**
- * 거리를 사람이 읽기 쉬운 형태로 변환
- */
 export function formatDistance(km: number): string {
   if (km < 1) {
     return `${Math.round(km * 1000)}m`;
@@ -283,9 +233,6 @@ export function formatDistance(km: number): string {
   return `${km.toFixed(1)}km`;
 }
 
-/**
- * 좌표가 bounds 내에 있는지 확인
- */
 export function isInBounds(location: Location, bounds: { sw: Location; ne: Location }): boolean {
   return (
     location.lat >= bounds.sw.lat &&

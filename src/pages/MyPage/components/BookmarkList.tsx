@@ -1,6 +1,5 @@
-// src/pages/MyPage/components/BookmarkList.tsx
 import { useNavigate } from 'react-router-dom';
-import styles from './BookmarkList.module.css';  // ✅ s 제거!
+import styles from './BookmarkList.module.css'; 
 
 interface Restaurant {
   id: number;
@@ -33,8 +32,7 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
       '일식': '🍱',
       '양식': '🍝',
       '카페': '☕',
-      '분식': '🍜',
-      '디저트': '🍰',
+      '기타': '🔗',
     };
     return categoryMap[category] || '🍽️';
   };
@@ -49,7 +47,6 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
   };
 
   const handleRestaurantClick = (restaurantId: number) => {
-    // 메인 페이지로 이동하면서 해당 식당 정보 팝업 열기
     navigate(`/?restaurant=${restaurantId}`);
   };
 

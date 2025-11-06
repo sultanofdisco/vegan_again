@@ -1,11 +1,8 @@
-/* src/pages/MyPage/components/ProfileSection.module.css */
-
 .container {
   max-width: 600px;
   margin: 0 auto;
 }
 
-/* 프로필 헤더 */
 .profileHeader {
   display: flex;
   justify-content: center;
@@ -64,7 +61,6 @@
   opacity: 1;
 }
 
-/* 정보 섹션 */
 .infoSection {
   display: flex;
   flex-direction: column;
@@ -133,7 +129,6 @@
   margin-top: 4px;
 }
 
-/* 버튼 그룹 */
 .buttonGroup {
   display: flex;
   gap: 12px;
@@ -191,7 +186,6 @@
   cursor: not-allowed;
 }
 
-/* 반응형 */
 @media (max-width: 768px) {
   .container {
     padding: 0;
