@@ -115,10 +115,6 @@ def upload_from_api():
         }
         records.append(record)
 
-    print("\n--- 업로드할 샘플 데이터 (3개) ---")
-    for r in records[:3]:
-        print(r)
-    print("---------------------------------")
 
     if records:
         print(f"Uploading {len(records)} vegan restaurants...")

@@ -48,9 +48,10 @@ SYSTEM_PROMPT = f"""
 4.  비건 메뉴 판단 (가장 중요): 위 2번 항목에 해당하는 동물성 재료가 전혀 없다면, 'lacto-ovo'가 아닌 'vegan'을 기본으로 고려합니다.
     - 특히 '샐러드', '야채', '과일', '두부', '고사리', '템페', '라페', '깻잎', '당근', '토마토', '케일', '배추', '우엉', '가지', '메밀', '아보카도'가 주재료인 메뉴는 'vegan'으로 분류합니다. (예: '아보카도 자몽 샐러드' -> 'vegan', '고사리 누들 파스타' -> 'vegan' 등)
     - '소이라떼', '오트라떼' 등 식물성 우유 메뉴는 'vegan'입니다.
-    - 이름에 비건이라고 표시된 경우 무조건 'vegan'으로 분류합니다. (예: '비건 버거', '비건 라떼' 등)
+    - 이름에 비건이라고 표시된 경우 무조건 'vegan'으로 분류합니다. (예: '비건 버거', '비건 라떼', '비건)모둠꼬치' 등)
     - 가스파초는 이름에 육류나 유제품이 명시되지 않은 이상 'vegan'으로 분류합니다.
     - 들어간 재료에 '계란', '우유', '치즈' 등이 명시되지 않은 이상, 'lacto', 'ovo', 'lacto-ovo'로 절대 분류하지 마세요.
+    - '콩까스', '두부까스' 등 두부가 주재료인 경우에는 'vegan'으로 분류합니다.
 5.  애매한 음료 처리: '아메리카노', '청포도에이드'처럼 채식 분류가 무의미한 '음료'의 경우에만 'others'로 분류하고 신뢰도를 낮춥니다.
     - 이 규칙을 '샐러드' 같은 '요리'에는 절대 적용하지 마세요.
     - 아포카토는 아보카도가 아니라 커피 음료이므로 'others'로 분류합니다. 
@@ -220,14 +221,17 @@ def get_restaurant_category_from_llm(menu_names: list):
 
 
 def analyze_restaurant_categories():
+    
     print("\n========== 2. 식당 카테고리 분석 시작 ==========")
-    print("분석할 식당을 DB에서 조회합니다.")
+    print("분석할 식당을 DB에서 조회합니다 (category가 101.0, 104.0, or NULL인 식당)...")
     try:
         response = supabase.table('restaurants') \
                            .select('restaurant_id, name') \
+                           .or_('category.eq.101.0,category.eq.104.0,category.is.null') \
                            .order('restaurant_id', desc=False) \
                            .execute()
         restaurants_to_analyze = response.data
+        
     except Exception as e:
         print(f"DB 조회 실패: {e}")
         return
@@ -250,12 +254,13 @@ def analyze_restaurant_categories():
                                .eq('restaurant_id', rest_id) \
                                .execute()
             menu_data = response.data
+            
         except Exception as e:
             print(f"(ID: {rest_id}) 메뉴 목록 조회 실패: {e}")
             continue
 
         if not menu_data:
-            print("(ID: {rest_id}) 메뉴가 DB에 없어 카테고리 분석을 건너뜁니다.")
+            print(f"(ID: {rest_id}) 메뉴가 DB에 없어 카테고리 분석을 건너뜁니다.")
             continue
 
         menu_names = [menu['menu_name'] for menu in menu_data]
@@ -283,6 +288,6 @@ if __name__ == "__main__":
     print("AI 분석 스크립트를 시작합니다.")
     
     analyze_all_menus() 
-    #analyze_restaurant_categories() 
+    analyze_restaurant_categories() 
     
     print("\n모든 AI 분석 작업이 완료되었습니다.")
