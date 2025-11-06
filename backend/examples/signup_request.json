@@ -1,0 +1,9 @@
+{
+  "email": "user@example.com",
+  "password": "Password123!",
+  "password_confirm": "Password123!",
+  "nickname": "사용자",
+  "profile_image_url": "https://example.com/profile.jpg",
+  "bio": "안녕하세요! 비건을 실천하고 있습니다."
+}
+
