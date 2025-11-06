@@ -1,21 +1,19 @@
-// src/pages/MyPage/MyPage.tsx (디버깅 버전)
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../../stores/useUserStore';
-import { supabase } from '../../lib/supabase';
+import apiClient from '../../lib/axios';
 import ProfileSection from './components/ProfileSection';
 import ReviewsList from './components/ReviewsList';
 import styles from './MyPage.module.css';
 import BookmarksList from './components/BookmarkList';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 type TabType = 'profile' | 'bookmarks' | 'reviews';
 
 interface UserProfile {
-  id: string;
+  user_id: number;
   email: string;
   nickname: string;
-  bio: string;
+  bio: string | null;
   profile_image_url: string | null;
 }
 
@@ -53,12 +51,10 @@ const MyPage = () => {
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('[MyPage] Current user:', user);
-    
     if (!user) {
-      console.log('[MyPage] No user found, redirecting to login');
       alert('로그인이 필요합니다.');
       navigate('/login');
       return;
@@ -69,101 +65,52 @@ const MyPage = () => {
 
   const fetchUserData = async () => {
     if (!user) {
-      console.log('[fetchUserData] No user');
       return;
     }
     
-    console.log('[fetchUserData] Starting data fetch for user:', user.id);
     setLoading(true);
+    setError(null);
     
     try {
       // 프로필 정보 가져오기
-      console.log('[fetchUserData] Fetching profile...');
-      const { data: profileData, error: profileError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        console.error('[Profile Error]:', profileError);
-        throw profileError;
+      const profileResponse = await apiClient.get('/users/profile');
+      if (profileResponse.data.success && profileResponse.data.data) {
+        const profileData = profileResponse.data.data;
+        setProfile({
+          user_id: profileData.userId,
+          email: profileData.email,
+          nickname: profileData.nickname,
+          bio: profileData.bio || null,
+          profile_image_url: profileData.profileImage || null,
+        });
       }
-      
-      console.log('[Profile Success]:', profileData);
-      setProfile(profileData);
 
       // 북마크 목록 가져오기
-      console.log('[fetchUserData] Fetching bookmarks...');
-      const { data: bookmarksData, error: bookmarksError } = await supabase
-        .from('bookmarks')
-        .select(`
-          id,
-          created_at,
-          restaurant:restaurants (
-            id,
-            name,
-            address,
-            category,
-            phone,
-            latitude,
-            longitude
-          )
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (bookmarksError) {
-        console.error('[Bookmarks Error]:', bookmarksError);
-        // 에러가 있어도 계속 진행 (빈 배열로)
+      try {
+        const bookmarksResponse = await apiClient.get('/users/bookmarks');
+        if (bookmarksResponse.data.success && bookmarksResponse.data.data) {
+          // 백엔드 응답 형식에 맞게 변환
+          const formattedBookmarks = bookmarksResponse.data.data.map((item: any) => ({
+            id: item.id,
+            restaurant: item.restaurants || item.restaurant,
+            created_at: item.created_at,
+          }));
+          setBookmarks(formattedBookmarks);
+        }
+      } catch (bookmarksError) {
+        console.error('북마크 로딩 실패:', bookmarksError);
         setBookmarks([]);
-      } else {
-        console.log('[Bookmarks Success]:', bookmarksData);
-        console.log('[Bookmarks Count]:', bookmarksData?.length || 0);
-        setBookmarks((bookmarksData as any) || []);
       }
 
-      // 작성한 리뷰 목록 가져오기
-      console.log('[fetchUserData] Fetching reviews...');
-      const { data: reviewsData, error: reviewsError } = await supabase
-        .from('reviews')
-        .select(`
-          id,
-          rating,
-          content,
-          image_url,
-          created_at,
-          restaurant:restaurants (
-            id,
-            name,
-            address,
-            category,
-            phone,
-            latitude,
-            longitude
-          )
-        `)
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
-
-      if (reviewsError) {
-        console.error('[Reviews Error]:', reviewsError);
-        // 에러가 있어도 계속 진행 (빈 배열로)
-        setReviews([]);
-      } else {
-        console.log('[Reviews Success]:', reviewsData);
-        console.log('[Reviews Count]:', reviewsData?.length || 0);
-        setReviews((reviewsData as any) || []);
-      }
-
-      console.log('[fetchUserData] All data fetched successfully!');
+      // 리뷰 목록 가져오기 (리뷰 API가 있다면)
+      // 현재는 빈 배열로 설정
+      setReviews([]);
 
     } catch (error) {
-      console.error('[fetchUserData] Critical error:', error);
-      alert('데이터를 불러오는데 실패했습니다. 콘솔을 확인해주세요.');
+      console.error('데이터 로딩 실패:', error);
+      setError('데이터를 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
-      console.log('[fetchUserData] Loading complete');
     }
   };
 
@@ -171,23 +118,31 @@ const MyPage = () => {
     if (!user) return;
 
     try {
-      console.log('[handleProfileUpdate] Updating profile:', updatedProfile);
-      
-      const { error } = await supabase
-        .from('users')
-        .update(updatedProfile)
-        .eq('id', user.id);
-
-      if (error) {
-        console.error('❌ [Profile Update Error]:', error);
-        throw error;
+      const updateData: any = {};
+      if (updatedProfile.nickname !== undefined) {
+        updateData.nickname = updatedProfile.nickname;
+      }
+      if (updatedProfile.bio !== undefined) {
+        updateData.bio = updatedProfile.bio;
+      }
+      if (updatedProfile.profile_image_url !== undefined) {
+        updateData.profileImage = updatedProfile.profile_image_url;
       }
 
-      console.log('[Profile Update Success]');
-      setProfile(prev => prev ? { ...prev, ...updatedProfile } : null);
-      alert('프로필이 수정되었습니다.');
+      const response = await apiClient.put('/users/profile', updateData);
+      if (response.data.success && response.data.data) {
+        const profileData = response.data.data;
+        setProfile({
+          user_id: profileData.userId,
+          email: profileData.email,
+          nickname: profileData.nickname,
+          bio: profileData.bio || null,
+          profile_image_url: profileData.profileImage || null,
+        });
+        alert('프로필이 수정되었습니다.');
+      }
     } catch (error) {
-      console.error('[handleProfileUpdate] Error:', error);
+      console.error('프로필 수정 실패:', error);
       alert('프로필 수정에 실패했습니다.');
     }
   };
@@ -196,24 +151,18 @@ const MyPage = () => {
     if (!confirm('즐겨찾기를 해제하시겠습니까?')) return;
 
     try {
-      console.log('[handleRemoveBookmark] Removing bookmark:', bookmarkId);
-      
-      const { error } = await supabase
-        .from('bookmarks')
-        .delete()
-        .eq('id', bookmarkId)
-        .eq('user_id', user?.id);
-
-      if (error) {
-        console.error('[Bookmark Delete Error]:', error);
-        throw error;
+      // bookmarkId로 restaurant_id 찾기
+      const bookmark = bookmarks.find(b => b.id === bookmarkId);
+      if (!bookmark) {
+        alert('즐겨찾기를 찾을 수 없습니다.');
+        return;
       }
 
-      console.log('[Bookmark Delete Success]');
+      await apiClient.delete(`/users/bookmarks/${bookmark.restaurant.id}`);
       setBookmarks(prev => prev.filter(bookmark => bookmark.id !== bookmarkId));
       alert('즐겨찾기가 해제되었습니다.');
     } catch (error) {
-      console.error('[handleRemoveBookmark] Error:', error);
+      console.error('즐겨찾기 해제 실패:', error);
       alert('즐겨찾기 해제에 실패했습니다.');
     }
   };
@@ -222,44 +171,18 @@ const MyPage = () => {
     if (!confirm('리뷰를 삭제하시겠습니까?')) return;
 
     try {
-      console.log('🗑️ [handleDeleteReview] Deleting review:', reviewId);
-      
-      const { error } = await supabase
-        .from('reviews')
-        .delete()
-        .eq('id', reviewId)
-        .eq('user_id', user?.id);
-
-      if (error) {
-        console.error('[Review Delete Error]:', error);
-        throw error;
-      }
-
-      console.log('[Review Delete Success]');
+      await apiClient.delete(`/users/reviews/${reviewId}`);
       setReviews(prev => prev.filter(review => review.id !== reviewId));
       alert('리뷰가 삭제되었습니다.');
     } catch (error) {
-      console.error('[handleDeleteReview] Error:', error);
+      console.error('리뷰 삭제 실패:', error);
       alert('리뷰 삭제에 실패했습니다.');
     }
   };
 
   const handleUpdateReview = async (reviewId: number, updatedContent: string) => {
     try {
-      console.log('[handleUpdateReview] Updating review:', reviewId, updatedContent);
-      
-      const { error } = await supabase
-        .from('reviews')
-        .update({ content: updatedContent })
-        .eq('id', reviewId)
-        .eq('user_id', user?.id);
-
-      if (error) {
-        console.error('[Review Update Error]:', error);
-        throw error;
-      }
-
-      console.log('[Review Update Success]');
+      await apiClient.put(`/users/reviews/${reviewId}`, { content: updatedContent });
       setReviews(prev => 
         prev.map(review => 
           review.id === reviewId 
@@ -269,12 +192,10 @@ const MyPage = () => {
       );
       alert('리뷰가 수정되었습니다.');
     } catch (error) {
-      console.error('[handleUpdateReview] Error:', error);
+      console.error('리뷰 수정 실패:', error);
       alert('리뷰 수정에 실패했습니다.');
     }
   };
-
-  console.log('[MyPage Render] State:', { loading, profile: !!profile, bookmarks: bookmarks.length, reviews: reviews.length });
 
   if (loading) {
     return (
@@ -285,14 +206,22 @@ const MyPage = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className={styles.errorContainer}>
+        <p>{error}</p>
+        <button onClick={() => fetchUserData()}>
+          다시 시도
+        </button>
+      </div>
+    );
+  }
+
   if (!profile) {
     return (
       <div className={styles.errorContainer}>
         <p>프로필 정보를 불러올 수 없습니다.</p>
-        <button onClick={() => {
-          console.log('[Retry] Fetching data again...');
-          fetchUserData();
-        }}>
+        <button onClick={() => fetchUserData()}>
           다시 시도
         </button>
       </div>

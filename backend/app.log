@@ -179,3 +179,50 @@
 2025-11-06 22:53:07,726 - werkzeug - INFO -  * Debugger PIN: 471-465-890
 2025-11-06 22:53:53,916 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:53:53] "POST /api/auth/login HTTP/1.1" 200 -
 2025-11-06 22:54:00,620 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 22:54:00] "POST /api/auth/logout HTTP/1.1" 200 -
+2025-11-06 22:58:37,781 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\bookmarks.py', reloading
+2025-11-06 22:58:37,889 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:58:38,723 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:58:38,731 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:58:40,813 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\bookmarks.py', reloading
+2025-11-06 22:58:40,941 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:58:41,886 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:58:41,893 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:58:42,704 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\bookmarks.py', reloading
+2025-11-06 22:58:42,845 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:58:44,060 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:58:44,068 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:58:46,779 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\bookmarks.py', reloading
+2025-11-06 22:58:46,915 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:58:48,300 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:58:48,313 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:59:02,049 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\bookmarks.py', reloading
+2025-11-06 22:59:02,137 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:59:02,861 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:59:02,866 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:59:14,572 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\bookmarks.py', reloading
+2025-11-06 22:59:14,648 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:59:15,431 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:59:15,437 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 22:59:43,190 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-06 22:59:43,190 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 22:59:43,192 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 22:59:44,129 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 22:59:44,135 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 23:00:23,776 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:00:23] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-06 23:00:26,458 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:00:26] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-06 23:00:26,695 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:00:26] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-06 23:00:26,764 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:00:26] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-06 23:00:27,001 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:00:27] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-06 23:01:18,528 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-06 23:01:18,528 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-06 23:01:18,529 - werkzeug - INFO -  * Restarting with stat
+2025-11-06 23:01:19,433 - werkzeug - WARNING -  * Debugger is active!
+2025-11-06 23:01:19,438 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-06 23:02:17,056 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:02:17] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-06 23:02:19,678 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:02:19] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-06 23:02:19,928 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:02:19] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-06 23:02:19,973 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:02:19] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-06 23:02:20,200 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:02:20] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-06 23:02:37,122 - werkzeug - INFO - 127.0.0.1 - - [06/Nov/2025 23:02:37] "PUT /api/users/profile HTTP/1.1" 200 -

@@ -1,13 +1,12 @@
 // src/pages/MyPage/components/ProfileSection.tsx
-import { useState, useRef } from 'react';
-import { supabase } from '../../../lib/supabase';
+import { useState, useEffect, useRef } from 'react';
 import styles from './ProfileSection.module.css';
 
 interface UserProfile {
-  id: string;
+  user_id: number;
   email: string;
   nickname: string;
-  bio: string;
+  bio: string | null;
   profile_image_url: string | null;
 }
 
@@ -19,9 +18,15 @@ interface ProfileSectionProps {
 const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [nickname, setNickname] = useState(profile.nickname);
-  const [bio, setBio] = useState(profile.bio);
+  const [bio, setBio] = useState(profile.bio || '');
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 프로필이 변경될 때마다 상태 업데이트
+  useEffect(() => {
+    setNickname(profile.nickname);
+    setBio(profile.bio || '');
+  }, [profile]);
 
   const validateNickname = (value: string): boolean => {
     // 2-20자, 한글/영문/숫자만 허용
@@ -60,38 +65,28 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
 
     setUploading(true);
     try {
-      // 기존 이미지가 있으면 삭제
-      if (profile.profile_image_url) {
-        const oldPath = profile.profile_image_url.split('/').pop();
-        if (oldPath) {
-          await supabase.storage
-            .from('profile-images')
-            .remove([`${profile.id}/${oldPath}`]);
+      // File을 Base64로 변환
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        try {
+          const base64String = reader.result as string;
+          await onUpdate({ profile_image_url: base64String });
+          alert('프로필 이미지가 변경되었습니다.');
+        } catch (error) {
+          console.error('이미지 업로드 실패:', error);
+          alert('이미지 업로드에 실패했습니다.');
+        } finally {
+          setUploading(false);
         }
-      }
-
-      // 새 이미지 업로드
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `${profile.id}/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('profile-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      // Public URL 가져오기
-      const { data: urlData } = supabase.storage
-        .from('profile-images')
-        .getPublicUrl(filePath);
-
-      await onUpdate({ profile_image_url: urlData.publicUrl });
-      alert('프로필 이미지가 변경되었습니다.');
+      };
+      reader.onerror = () => {
+        alert('파일 읽기에 실패했습니다.');
+        setUploading(false);
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
       alert('이미지 업로드에 실패했습니다.');
-    } finally {
       setUploading(false);
     }
   };
@@ -108,13 +103,13 @@ const ProfileSection = ({ profile, onUpdate }: ProfileSectionProps) => {
       return;
     }
 
-    await onUpdate({ nickname, bio });
+    await onUpdate({ nickname, bio: bio || null });
     setIsEditing(false);
   };
 
   const handleCancel = () => {
     setNickname(profile.nickname);
-    setBio(profile.bio);
+    setBio(profile.bio || '');
     setIsEditing(false);
   };
 
