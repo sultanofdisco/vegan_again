@@ -1,3 +1,4 @@
+// src/components/ReviewList.tsx
 import { useState, type MouseEvent } from 'react'; 
 import { useNavigate } from 'react-router-dom';
 import type { Review } from '../types/review';
@@ -6,7 +7,7 @@ import styles from './ReviewList.module.css';
 interface ReviewListProps {
   reviews: Review[];
   isLoggedIn: boolean;
-  onSubmitReview: (content: string, images: File[], rating: number) => Promise<void>;
+  onSubmitReview: (content: string, image: File | null, rating: number) => Promise<void>;  // ✅ 수정
 }
 
 function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
@@ -15,8 +16,8 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
 
   const [visibleCount, setVisibleCount] = useState(3);
   const [reviewContent, setReviewContent] = useState('');
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);      // ✅ 수정
+  const [previewUrl, setPreviewUrl] = useState<string>('');                   // ✅ 수정
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,32 +34,36 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
     setVisibleCount(prev => prev + 3);
   };
 
+  // ✅ 수정: 단일 이미지 선택
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
+    const file = e.target.files?.[0];
     
-    if (selectedImages.length + files.length > 5) {
-      alert('이미지는 최대 5개까지 업로드할 수 있습니다.');
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일만 업로드할 수 있습니다.');
       return;
     }
 
-    const imageFiles = files.filter(file => file.type.startsWith('image/'));
-    if (imageFiles.length !== files.length) {
-      alert('이미지 파일만 업로드할 수 있습니다.');
+    // 기존 미리보기 URL 해제
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
     }
 
-    const newPreviewUrls = imageFiles.map(file => URL.createObjectURL(file));
-    
-    setSelectedImages(prev => [...prev, ...imageFiles]);
-    setPreviewUrls(prev => [...prev, ...newPreviewUrls]);
+    setSelectedImage(file);
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
-  const handleRemoveImage = (index: number) => {
-    URL.revokeObjectURL(previewUrls[index]);
-    
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
-    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
+  // ✅ 수정: 이미지 제거
+  const handleRemoveImage = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedImage(null);
+    setPreviewUrl('');
   };
 
+  // ✅ 수정: 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -79,13 +84,15 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
 
     setIsSubmitting(true);
     try {
-      await onSubmitReview(reviewContent, selectedImages, rating);
+      await onSubmitReview(reviewContent, selectedImage, rating);  // ✅ 수정
       
       // 초기화
       setReviewContent('');
-      setSelectedImages([]);
-      previewUrls.forEach(url => URL.revokeObjectURL(url));
-      setPreviewUrls([]);
+      setSelectedImage(null);                                       // ✅ 수정
+      if (previewUrl) {                                            // ✅ 수정
+        URL.revokeObjectURL(previewUrl);
+      }
+      setPreviewUrl('');                                           // ✅ 수정
       setRating(0);
       
       alert('리뷰가 등록되었습니다!');
@@ -148,17 +155,14 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
                   )}
                 </div>
 
-                {/* 리뷰 이미지 */}
+                {/* ✅ 수정: 단일 이미지만 표시 */}
                 {review.images && review.images.length > 0 && (
                   <div className={styles.images}>
-                    {review.images.map((image, index) => (
-                      <img
-                        key={index}
-                        src={image}
-                        alt={`리뷰 이미지 ${index + 1}`}
-                        className={styles.image}
-                      />
-                    ))}
+                    <img
+                      src={review.images[0]}
+                      alt="리뷰 이미지"
+                      className={styles.image}
+                    />
                   </div>
                 )}
 
@@ -209,38 +213,34 @@ function ReviewList({ reviews, isLoggedIn, onSubmitReview }: ReviewListProps) {
             </div>
           </div>
 
-          {/* 이미지 업로드 */}
+          {/* ✅ 수정: 단일 이미지 업로드 */}
           <div className={styles.imageUploadSection}>
             <label htmlFor="imageUpload" className={styles.imageUploadLabel}>
               <span>사진 추가</span>
-              <span className={styles.imageCount}>
-                ({selectedImages.length}/5)
-              </span>
+              {selectedImage && <span className={styles.imageCount}>(1/1)</span>}
             </label>
             <input
               id="imageUpload"
               type="file"
               accept="image/*"
-              multiple
               onChange={handleImageSelect}
               className={styles.imageUploadInput}
+              disabled={!!selectedImage}  // ✅ 이미 선택되면 비활성화
             />
             
-            {/* 이미지 미리보기 */}
-            {previewUrls.length > 0 && (
+            {/* ✅ 수정: 단일 이미지 미리보기 */}
+            {previewUrl && (
               <div className={styles.imagePreviews}>
-                {previewUrls.map((url, index) => (
-                  <div key={index} className={styles.imagePreview}>
-                    <img src={url} alt={`미리보기 ${index + 1}`} />
-                    <button
-                      type="button"
-                      className={styles.removeImageButton}
-                      onClick={() => handleRemoveImage(index)}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+                <div className={styles.imagePreview}>
+                  <img src={previewUrl} alt="미리보기" />
+                  <button
+                    type="button"
+                    className={styles.removeImageButton}
+                    onClick={handleRemoveImage}
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             )}
           </div>

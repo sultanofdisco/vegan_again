@@ -1,4 +1,5 @@
-import { VegetarianLevelKR } from '../types/common';
+// src/components/MenuList.tsx
+import { VegetarianLevelLabel, VegetarianLevelEmoji } from '../types/common';
 import type { Menu } from '../types/menu';
 import styles from './MenuList.module.css';
 
@@ -29,36 +30,59 @@ function MenuList({ menus }: MenuListProps) {
             )}
           </div>
 
+          {/* 재료/설명 */}
           {menu.description && (
             <p className={styles.menuDescription}>{menu.description}</p>
           )}
 
-          {/* AI 채식 단계 분석 */}
+          {/* ✅ AI 채식 단계 분석 (단일) */}
           <div className={styles.veganLevels}>
             <div className={styles.levelTitle}>
               AI 채식 단계 분석
             </div>
-            {menu.vegetarianLevels.map((vLevel, index) => (
-              <div key={index} className={styles.levelItem}>
+            
+            {menu.vegetarianLevel ? (
+              <div className={styles.levelItem}>
                 <div className={styles.levelHeader}>
                   <span className={styles.levelName}>
-                    {VegetarianLevelKR[vLevel.level]}
+                    {VegetarianLevelEmoji[menu.vegetarianLevel]}{' '}
+                    {VegetarianLevelLabel[menu.vegetarianLevel]}
                   </span>
-                  <span className={styles.levelProbability}>
-                    {vLevel.probability}%
-                  </span>
+                  {menu.confidenceScore !== null && (
+                    <span className={styles.levelProbability}>
+                      {Math.round(menu.confidenceScore * 100)}%
+                    </span>
+                  )}
                 </div>
-                <div className={styles.levelBar}>
-                  <div
-                    className={styles.levelBarFill}
-                    style={{ width: `${vLevel.probability}%` }}
-                  />
-                </div>
-                {vLevel.reason && (
-                  <p className={styles.levelReason}>{vLevel.reason}</p>
+                
+                {/* 신뢰도 바 */}
+                {menu.confidenceScore !== null && (
+                  <div className={styles.levelBar}>
+                    <div
+                      className={styles.levelBarFill}
+                      style={{ width: `${Math.round(menu.confidenceScore * 100)}%` }}
+                    />
+                  </div>
+                )}
+                
+                {/* 분석 일시 */}
+                {menu.analyzedAt && (
+                  <p className={styles.levelReason}>
+                    분석 일시: {new Date(menu.analyzedAt).toLocaleString('ko-KR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </p>
                 )}
               </div>
-            ))}
+            ) : (
+              <p className={styles.noAnalysis}>
+                아직 분석되지 않은 메뉴입니다.
+              </p>
+            )}
           </div>
         </div>
       ))}

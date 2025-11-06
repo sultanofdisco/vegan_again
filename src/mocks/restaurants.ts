@@ -4,7 +4,7 @@ import { mockMenus } from "./menus";
 
 export const mockRestaurants: Restaurant[] = [
   {
-    id: 'rest-1',
+    id: '1',
     name: '그린키친',
     address: '서울 강남구 테헤란로 123',
     location: {
@@ -29,7 +29,7 @@ export const mockRestaurants: Restaurant[] = [
     isBookmarked: false,
   },
   {
-    id: 'rest-2',
+    id: '2',
     name: '베지가든',
     address: '서울 서초구 강남대로 456',
     location: {
@@ -49,7 +49,7 @@ export const mockRestaurants: Restaurant[] = [
     isBookmarked: true,
   },
   {
-    id: 'rest-3',
+    id: '3',
     name: '씨푸드 하우스',
     address: '서울 송파구 올림픽로 789',
     location: {
@@ -70,7 +70,7 @@ export const mockRestaurants: Restaurant[] = [
     isBookmarked: false,
   },
   {
-    id: 'rest-4',
+    id: '4',
     name: '채식나라',
     address: '서울 마포구 월드컵로 321',
     location: {
@@ -90,7 +90,7 @@ export const mockRestaurants: Restaurant[] = [
     isBookmarked: true,
   },
   {
-    id: 'rest-5',
+    id: '5',
     name: '플랜트 카페',
     address: '서울 용산구 이태원로 555',
     location: {

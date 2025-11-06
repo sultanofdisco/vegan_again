@@ -6,7 +6,8 @@ import styles from './FilterPanel.module.css';
 function FilterPanel() {
   const { categories, toggleCategory, resetFilters } = useSearchStore();
 
-  const allCategories: FoodCategory[] = ['korean', 'chinese', 'japanese', 'western', 'cafe'];
+  // ✅ 'etc' 추가, 'dessert' 제거
+  const allCategories: FoodCategory[] = ['korean', 'chinese', 'japanese', 'western', 'cafe', 'etc'];
 
   const getCategoryLabel = (cat: FoodCategory) => {
     return FoodCategoryKR[cat];
