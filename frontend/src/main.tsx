@@ -2,8 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
-// 전역 스타일
-import './styles/global.css';
+import './styles/global.css'; {/* 전역 스타일 import */}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
