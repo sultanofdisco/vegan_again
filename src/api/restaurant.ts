@@ -149,8 +149,9 @@ export const searchRestaurants = async (
   categories: FoodCategory[] = []
 ): Promise<SearchResult> => {
   try {
+    // ✅ 여러 카테고리를 쉼표로 연결 (예: "한식,일식,양식")
     const categoryParam = categories.length > 0 
-      ? convertCategoryToBackend(categories[0])
+      ? categories.map(cat => convertCategoryToBackend(cat)).join(',')
       : '';
 
     console.log('🔍 [API] 검색 요청:', { keyword, categories, categoryParam });
@@ -158,7 +159,7 @@ export const searchRestaurants = async (
     const response = await apiClient.get<ApiResponse>('/search', {
       params: {
         keyword: keyword.trim(),
-        category: categoryParam,
+        category: categoryParam, // "한식,일식" 형태로 전송
       },
     });
 
