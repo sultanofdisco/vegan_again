@@ -1,6 +1,6 @@
 import json
 import os
-from flask import Flask  # pyright: ignore[reportMissingImports]
+from flask import Flask, jsonify  # pyright: ignore[reportMissingImports]
 from flask_cors import CORS  # pyright: ignore[reportMissingModuleSource]
 from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
 load_dotenv()
@@ -22,7 +22,9 @@ from app.config import SECRET_KEY
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 app.config['JSONIFY_MIMETYPE'] = 'application/json; charset=utf-8'
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": os.getenv('FRONTEND_ORIGIN', 'http://localhost:5173')}}, supports_credentials=True)
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['SESSION_COOKIE_SECURE'] = False
 
 # 세션을 위한 secret key 설정
 app.config['SECRET_KEY'] = SECRET_KEY
