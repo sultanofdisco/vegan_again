@@ -9,28 +9,26 @@ interface ApiResponse {
   error?: string;
 }
 
-// 🚨 수정: DB 스키마(snake_case)에 맞게 ApiRestaurant 타입 정의 변경
 interface ApiRestaurant {
-  restaurant_id: number; // 🚨 id -> restaurant_id로 변경
+  restaurant_id: number; 
   name: string;
   address: string;
   latitude?: number;
   longitude?: number;
   phone?: string;
   category?: string;
-  business_hours?: string; // 🚨 business_hours로 변경 (camelCase -> snake_case)
-  data_source?: string;    // 🚨 data_source 추가
+  business_hours?: string; 
+  data_source?: string;  
   
-  // DB 스키마에 없는 필드는 그대로 두거나 API 응답을 확인하여 추가
   closed_days?: string;
   available_levels?: string[];
   rating?: number;
   review_count?: number;
-  thumbnail_url?: string;
+  thumbnailUrl?: string;
   image_urls?: string[];
 
-  created_at?: string; // 🚨 created_at로 변경
-  updated_at?: string; // 🚨 updated_at로 변경
+  created_at?: string; 
+  updated_at?: string; 
 }
 
 interface SearchResult {
@@ -67,7 +65,6 @@ const convertCategoryToBackend = (category: FoodCategory): string => {
   return map[category] || '기타';
 };
 
-// 🔒 VegetarianLevel 타입 검증 함수
 const isValidVegetarianLevel = (level: string): level is VegetarianLevel => {
   const validLevels: VegetarianLevel[] = [
     'vegan',
@@ -81,7 +78,6 @@ const isValidVegetarianLevel = (level: string): level is VegetarianLevel => {
   return validLevels.includes(level as VegetarianLevel);
 };
 
-// 🔒 string[]을 VegetarianLevel[]로 안전하게 변환
 const convertToVegetarianLevels = (levels?: string[]): VegetarianLevel[] => {
   if (!Array.isArray(levels)) return [];
   
@@ -90,19 +86,15 @@ const convertToVegetarianLevels = (levels?: string[]): VegetarianLevel[] => {
     .map(level => level as VegetarianLevel);
 };
 
-// 🔒 보안: API 데이터 검증 및 변환 함수
 const convertApiRestaurantToRestaurant = (item: ApiRestaurant): Restaurant => {
-  // 🚨 수정: 필수 필드 검증을 'restaurant_id'로 변경
   if (!item.restaurant_id || !item.name || !item.address) { 
     throw new Error('필수 필드가 누락되었습니다.');
   }
 
-  // 🚨 수정: 숫자 타입 검증을 'restaurant_id'로 변경
   if (typeof item.restaurant_id !== 'number') { 
     throw new Error('잘못된 식당 ID 형식입니다.');
   }
 
-  // 좌표 검증 (유효 범위 체크)
   const latitude = item.latitude || 37.5665;
   const longitude = item.longitude || 126.9780;
 
@@ -133,7 +125,7 @@ const convertApiRestaurantToRestaurant = (item: ApiRestaurant): Restaurant => {
     availableLevels: convertToVegetarianLevels(item.available_levels),
     rating: typeof item.rating === 'number' ? item.rating : undefined,
     reviewCount: typeof item.review_count === 'number' ? item.review_count : 0,
-    thumbnailUrl: item.thumbnail_url || undefined,
+    thumbnailUrl: item.thumbnailUrl || undefined,
     imageUrls: Array.isArray(item.image_urls) ? item.image_urls : [],
     
     // 🚨 수정: 'data_source', 'created_at', 'updated_at' 매핑
@@ -149,47 +141,53 @@ export const searchRestaurants = async (
   categories: FoodCategory[] = []
 ): Promise<SearchResult> => {
   try {
-    // ✅ 여러 카테고리를 쉼표로 연결 (예: "한식,일식,양식")
     const categoryParam = categories.length > 0 
       ? categories.map(cat => convertCategoryToBackend(cat)).join(',')
       : '';
-
+      
     console.log('🔍 [API] 검색 요청:', { keyword, categories, categoryParam });
 
     const response = await apiClient.get<ApiResponse>('/search', {
       params: {
         keyword: keyword.trim(),
-        category: categoryParam, // "한식,일식" 형태로 전송
+        category: categoryParam,
       },
     });
 
     console.log('✅ [API] 응답:', response.data);
 
+    // 🔍 추가: 첫 번째 식당의 원본 데이터 확인
+    if (response.data.data.length > 0) {
+      console.log('🖼️ 첫 번째 식당 원본 데이터:', response.data.data[0]);
+      console.log('🖼️ thumbnail_url 값:', response.data.data[0].thumbnailUrl);
+    }
+
     if (!response.data.success) {
       throw new Error(response.data.error || '검색 실패');
     }
 
-    // 🔒 보안: 각 데이터 항목을 검증하며 변환
     const restaurants: Restaurant[] = [];
     
     for (const item of response.data.data) {
-      // 배열 항목이 유효한 객체인지 확인 (기존 방어 로직)
       if (!item || typeof item !== 'object') {
-        console.error('❌ 식당 데이터 변환 실패: API 응답 배열에 유효하지 않은 항목(null/undefined)이 포함되어 있습니다. 항목을 건너뜁니다.');
+        console.error('식당 데이터 변환 실패: API 응답 배열에 유효하지 않은 항목(null/undefined)이 포함되어 있습니다. 항목을 건너뜁니다.');
         continue;
       }
       
       try {
         const restaurant = convertApiRestaurantToRestaurant(item as ApiRestaurant);
+        // 🔍 추가: 변환 후 thumbnailUrl 확인
+        console.log('🖼️ 변환 후:', {
+          name: restaurant.name,
+          thumbnailUrl: restaurant.thumbnailUrl
+        });
+        
         restaurants.push(restaurant);
       } catch (error) {
-        // 🚨 개선된 로깅: 이제 item.restaurant_id를 사용합니다.
         const itemId = (item as ApiRestaurant).restaurant_id ?? '필드누락';
-        console.error(`❌ 식당 데이터 변환 실패 (ID: ${itemId}):`, error);
+        console.error(`식당 데이터 변환 실패 (ID: ${itemId}):`, error);
       }
     }
-
-    console.log('✅ [API] 변환된 식당 목록:', restaurants);
 
     return {
       success: true,
@@ -199,7 +197,7 @@ export const searchRestaurants = async (
     };
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error('❌ [API] 검색 오류:', error);
+    console.error('[API] 검색 오류:', error);
 
     const errorMessage =
       error.response?.data?.error ||

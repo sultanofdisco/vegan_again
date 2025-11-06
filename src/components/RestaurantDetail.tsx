@@ -16,6 +16,8 @@ interface RestaurantDetailProps {
 type TabType = 'menu' | 'review';
 
 function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
+    console.log('🖼️ RestaurantDetail - thumbnailUrl:', restaurant.thumbnailUrl);
+
     const user = useUserStore((state) => state.user);
     const [activeTab, setActiveTab] = useState<TabType>('menu');
     
