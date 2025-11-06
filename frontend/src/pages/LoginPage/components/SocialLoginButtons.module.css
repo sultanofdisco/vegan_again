@@ -1,0 +1,49 @@
+.socialButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.googleButton,
+.kakaoButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.googleButton:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  border-color: #ccc;
+}
+
+.kakaoButton {
+  background-color: #fee500;
+  border-color: #fee500;
+  color: #000000;
+}
+
+.kakaoButton:hover:not(:disabled) {
+  background-color: #fdd835;
+  border-color: #fdd835;
+}
+
+.googleButton:disabled,
+.kakaoButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.googleButton svg,
+.kakaoButton svg {
+  flex-shrink: 0;
+}

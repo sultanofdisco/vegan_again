@@ -1,461 +1,177 @@
-import { useState, useEffect } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState } from 'react';
 import MenuList from './MenuList';
 import ReviewList from './ReviewList';
 import styles from './RestaurantDetail.module.css';
 import type { Restaurant } from '../types/restaurant';
-import type { Review } from '../types/review';
-import type { Menu } from '../types/menu';
 import { useUserStore } from '../stores/useUserStore';
-import apiClient from '../lib/axios';
-import { supabase } from '../lib/supabase';
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useRestaurantMenus } from '../hooks/useRestaurantMenus';
+import { useRestaurantReviews } from '../hooks/useRestaurantReviews';
+import { useRestaurantBookmark } from '../hooks/useRestaurantBookmark';
+import { useImageUpload } from '../hooks/useImageUpload';
 
 interface RestaurantDetailProps {
-    restaurant: Restaurant;
-    onClose: () => void;
+  restaurant: Restaurant;
+  onClose: () => void;
 }
 
 type TabType = 'menu' | 'review';
 
 function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
-    const user = useUserStore((state) => state.user);
-    const [activeTab, setActiveTab] = useState<TabType>('menu');
-    const [isBookmarked, setIsBookmarked] = useState(false);
-    const [_bookmarkId, setBookmarkId] = useState<number | null>(null);
-    const [loading, setLoading] = useState(false);
-    const [reviews, setReviews] = useState<Review[]>([]);
-    const [reviewsLoading, setReviewsLoading] = useState(true);
-    const [menus, setMenus] = useState<Menu[]>([]);
-    const [menusLoading, setMenusLoading] = useState(true);
+  const user = useUserStore((state) => state.user);
+  const [activeTab, setActiveTab] = useState<TabType>('menu');
 
-    const restaurantId = restaurant.id;
+  // Custom Hooks
+  const { menus, loading: menusLoading } = useRestaurantMenus(restaurant.id);
+  const { reviews, loading: reviewsLoading, refetch: refetchReviews } = useRestaurantReviews(restaurant.id);
+  const { isBookmarked, loading: bookmarkLoading, toggleBookmark } = useRestaurantBookmark(restaurant.id, user);
+  const { uploadImage } = useImageUpload();
 
-    const fetchMenus = async (restaurantIdNum: number | string) => {
-        setMenusLoading(true);
-        try {
-            let queryValue: number | string = restaurantIdNum;
-                        
-            if (typeof restaurantIdNum === 'string') {
-                if (restaurantIdNum.includes('rest-')) {
-                    queryValue = parseInt(restaurantIdNum.replace('rest-', ''));
-                } else {
-                    queryValue = parseInt(restaurantIdNum);
-                }
-                
-                if (isNaN(queryValue as number)) {
-                    setMenus([]);
-                    setMenusLoading(false);
-                    return;
-                }
-            }
-                        
-            const { data, error } = await supabase
-                .from('menus')
-                .select(`
-                    menu_id,
-                    restaurant_id,
-                    menu_name,
-                    price,
-                    description,
-                    vegetarian_level,
-                    confidence_score,
-                    ingredients,
-                    analyzed_at,
-                    created_at,
-                    updated_at
-                `)
-                .eq('restaurant_id', queryValue);
+  const handleBookmarkClick = async () => {
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+    await toggleBookmark();
+  };
 
-            if (error) throw error;
-            
-            const formattedMenus: Menu[] = (data || []).map(menu => ({
-                id: menu.menu_id,
-                name: menu.menu_name,
-                price: menu.price,
-                description: menu.description, // ingredients를 description으로 사용
-                vegetarianLevel: menu.vegetarian_level,
-                confidenceScore: menu.confidence_score,
-                analyzedAt: menu.analyzed_at,
-            }));
-            
-            setMenus(formattedMenus);
-            
-        } catch (error) {
-            console.error('[Fetch Menus Failed]:', error);
-            setMenus([]);
-        } finally {
-            setMenusLoading(false);
+  const handleSubmitReview = async (content: string, image: File | null, rating: number) => {
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    try {
+      let imageUrl: string | null = null;
+
+      if (image) {
+        imageUrl = await uploadImage(image, user.user_id);
+        if (!imageUrl) {
+          alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+          return;
         }
-    };
+      }
 
-    // 리뷰 목록 불러오기
-    const fetchReviews = async (restaurantIdNum: number | string) => {
-        setReviewsLoading(true);
-        try {
-            let queryValue: number | string = restaurantIdNum;
-                        
-            if (typeof restaurantIdNum === 'string') {
-                if (restaurantIdNum.includes('rest-')) {
-                    queryValue = parseInt(restaurantIdNum.replace('rest-', ''));
-                } else {
-                    queryValue = parseInt(restaurantIdNum);
-                }
-                
-                if (isNaN(queryValue as number)) {
-                    setReviews([]);
-                    setReviewsLoading(false);
-                    return;
-                }
-            }
-                        
-            const { data: reviewsData, error: reviewsError } = await supabase
-                .from('reviews')
-                .select('review_id, rating, content, created_at, updated_at, image_url, user_id')
-                .eq('restaurant_id', queryValue)
-                .order('created_at', { ascending: false });
+      // 백엔드 API를 통해 리뷰 작성
+      const apiClient = (await import('../lib/axios')).default;
+      const response = await apiClient.post(`/restaurants/${restaurant.id}/reviews`, {
+        title: content.substring(0, 100),
+        content: content,
+        rating: rating,
+        image_url: imageUrl,
+      });
 
-            if (reviewsError) throw reviewsError;
-            
-            if (!reviewsData || reviewsData.length === 0) {
-                setReviews([]);
-                return;
-            }
+      if (response.data.success) {
+        await refetchReviews();
+        alert('리뷰가 등록되었습니다.');
+      } else {
+        throw new Error(response.data.error || '리뷰 등록 실패');
+      }
+    } catch (error: any) {
+      console.error('[Submit Review Error]:', error);
+      const errorMessage = error.response?.data?.error || error.message || '리뷰 등록 중 오류가 발생했습니다.';
+      alert(errorMessage);
+    }
+  };
 
-            const userIds = [...new Set(reviewsData.map(r => r.user_id))];
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+        {/* 이미지 섹션 */}
+        {restaurant.thumbnailUrl && (
+          <div className={styles.imageSection}>
+            <img 
+              src={restaurant.thumbnailUrl} 
+              alt={restaurant.name}
+              className={styles.image}
+            />
+            <button onClick={onClose} className={styles.closeButtonOnImage}>
+              ✕
+            </button>
+          </div>
+        )}
 
-            const { data: usersData, error: usersError } = await supabase
-                .from('users')
-                .select('user_id, nickname, profile_image_url')
-                .in('user_id', userIds);
-
-            if (usersError) {
-                console.warn('[Users Fetch Warning]:', usersError);
-            }
-
-            const usersMap = new Map(
-                (usersData || []).map(u => [u.user_id, u])
-            );
-
-            const formattedReviews: Review[] = reviewsData.map((review): Review => {
-                const user = usersMap.get(review.user_id);
-                return {
-                    id: review.review_id,
-                    content: review.content,
-                    rating: review.rating || 0,
-                    createdAt: review.created_at,
-                    updatedAt: review.updated_at,
-                    userName: user?.nickname || '익명',
-                    userProfileImage: user?.profile_image_url || null,
-                    images: review.image_url ? [review.image_url] : [],
-                };
-            });
-
-            setReviews(formattedReviews);
-            
-        } catch (error) {
-            console.error('❌ [Fetch Reviews Failed]:', error);
-            setReviews([]);
-        } finally {
-            setReviewsLoading(false);
-        }
-    };
-
-    const checkBookmarkStatus = async () => {
-        if (!user) return;
-    
-        try {
-            // 백엔드 API로 북마크 목록 조회
-            const response = await apiClient.get('/users/bookmarks');
-            if (response.data.success && response.data.data) {
-                // 현재 식당이 북마크에 있는지 확인
-                // 백엔드 응답 형식: { restaurants: {...} } 또는 { restaurant_id: ... }
-                const bookmark = response.data.data.find(
-                    (item: any) => {
-                        const restaurantIdFromItem = 
-                            item.restaurant_id || 
-                            (item.restaurants && item.restaurants.id) ||
-                            (item.restaurant && item.restaurant.id);
-                        return restaurantIdFromItem === restaurantId;
-            }
-                );
-    
-                if (bookmark) {
-                setIsBookmarked(true);
-                    setBookmarkId(bookmark.id);
-                } else {
-                    setIsBookmarked(false);
-                    setBookmarkId(null);
-                }
-            } else {
-                setIsBookmarked(false);
-                setBookmarkId(null);
-            }
-        } catch (error) {
-            console.error('[Bookmark Check Failed]:', error);
-            setIsBookmarked(false);
-            setBookmarkId(null);
-        }
-    };
-
-    const handleAddBookmark = async () => {
-        if (!user) {
-            alert('로그인이 필요합니다.');
-            return;
-        }
-    
-        setLoading(true);
-        try {
-            // 백엔드 API로 북마크 추가
-            const response = await apiClient.post(`/users/bookmarks/${restaurantId}`);
-    
-            if (response.data.success) {
-                setIsBookmarked(true);
-                // 북마크 ID는 백엔드에서 반환하지 않으므로 상태 확인으로 다시 조회
-                    await checkBookmarkStatus();
-            alert('찜 목록에 추가되었습니다!');
-            } else {
-                throw new Error(response.data.error || '북마크 추가 실패');
-            }
-        } catch (error: any) {
-            console.error('[Add Bookmark Error]:', error);
-            
-            // 409 에러는 이미 추가된 경우
-            if (error.response?.status === 409 || error.response?.status === 400) {
-                alert('이미 즐겨찾기한 식당입니다.');
-                await checkBookmarkStatus();
-            } else {
-                alert('찜하기에 실패했습니다. 다시 시도해주세요.');
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleRemoveBookmark = async () => {
-        if (!user) return;
-
-        setLoading(true);
-        try {
-            // 백엔드 API로 북마크 삭제
-            const response = await apiClient.delete(`/users/bookmarks/${restaurantId}`);
-
-            if (response.data.success) {
-            setIsBookmarked(false);
-            setBookmarkId(null);
-            alert('찜 해제되었습니다.');
-            } else {
-                throw new Error(response.data.error || '북마크 삭제 실패');
-            }
-        } catch (error) {
-            console.error('[Remove Bookmark Failed]:', error);
-            alert('찜 해제에 실패했습니다. 다시 시도해주세요.');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const handleBookmarkToggle = () => {
-        if (loading) return;
-        if (isBookmarked) {
-            handleRemoveBookmark();
-        } else {
-            handleAddBookmark();
-        }
-    };
-
-    const uploadImage = async (file: File, userId: string): Promise<string | null> => {
-        const MAX_FILE_SIZE = 5 * 1024 * 1024;
-
-        if (file.size > MAX_FILE_SIZE) {
-            console.error(`파일이 너무 큽니다: ${file.name}`);
-            alert(`${file.name}은(는) 5MB를 초과합니다.`);
-            return null;
-        }
-
-        const fileExtension = file.name.split('.').pop();
-        const path = `${userId}/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExtension}`;
-        
-        try {
-            const { error: uploadError } = await supabase.storage
-                .from('review_images')
-                .upload(path, file, {
-                    cacheControl: '3600',
-                    upsert: false,
-                });
-
-            if (uploadError) throw uploadError;
-
-            const { data } = supabase.storage
-                .from('review_images')
-                .getPublicUrl(path);
-
-            return data.publicUrl;
-
-        } catch (error) {
-            console.error('[Image Upload Error]:', error);
-            return null;
-        }
-    };
-
-    const handleSubmitReview = async (content: string, image: File | null, rating: number) => {
-        if (!user) {
-            alert('로그인이 필요합니다.');
-            return;
-        }
-
-        try {
-            let imageUrl: string | null = null;
-
-            // 이미지가 있으면 Supabase Storage에 업로드
-            if (image) {
-                console.log('[Submit Review] 이미지 업로드 시작...');
-                
-                // 파일 타입 검증
-                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-                if (!allowedTypes.includes(image.type)) {
-                    alert('JPEG, PNG, GIF, WEBP 형식의 이미지만 업로드할 수 있습니다.');
-                    return;
-                }
-
-                imageUrl = await uploadImage(image, user.id);
-                
-                if (imageUrl) {
-                    console.log('[Image Upload Success]:', imageUrl);
-                } else {
-                    console.warn('[Image Upload Failed]');
-                    alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
-                    return;
-                }
-            }
-
-            // 백엔드 API를 통해 리뷰 작성
-            const response = await apiClient.post(`/restaurants/${restaurantId}/reviews`, {
-                title: content.substring(0, 100), // 제목은 내용의 처음 100자
-                content: content,
-                rating: rating,
-                image_url: imageUrl, // Supabase Storage URL 전송
-            });
-
-            if (response.data.success) {
-                console.log('✅ [Review Submit Success]');
-                // 리뷰 목록 새로고침
-                await fetchReviews(restaurantId);
-                alert('리뷰가 등록되었습니다.');
-            } else {
-                throw new Error(response.data.error || '리뷰 등록 실패');
-            }
-        } catch (error: any) {
-            console.error('[Submit Review Error]:', error);
-            const errorMessage = error.response?.data?.error || error.message || '리뷰 등록 중 오류가 발생했습니다.';
-            alert(errorMessage);
-        }
-    };
-
-    useEffect(() => {        
-        if (user) {
-            checkBookmarkStatus();
-        }
-        
-        fetchReviews(restaurantId);
-        fetchMenus(restaurantId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [restaurantId, user]);
-
-    return (
-        <div className={styles.overlay} onClick={onClose}>
-            <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                {restaurant.thumbnailUrl && (
-                    <div className={styles.imageSection}>
-                        <img 
-                            src={restaurant.thumbnailUrl} 
-                            alt={restaurant.name}
-                            className={styles.image}
-                        />
-                        <button onClick={onClose} className={styles.closeButtonOnImage}>
-                            ✕
-                        </button>
-                    </div>
-                )}
-
-                <div className={styles.header}>
-                    <div className={styles.titleSection}>
-                        <h2 className={styles.name}>{restaurant.name}</h2>
-                        <button
-                            onClick={handleBookmarkToggle}
-                            className={`${styles.bookmarkButton} ${isBookmarked ? styles.bookmarked : ''}`}
-                            aria-label={isBookmarked ? '찜 해제' : '찜하기'}
-                            disabled={loading}
-                        >
-                            {loading ? '-' : isBookmarked ? '❤️' : '🤍'}
-                        </button>
-                    </div>
-                    {!restaurant.thumbnailUrl && (
-                        <button onClick={onClose} className={styles.closeButton}>
-                            ✕
-                        </button>
-                    )}
-                </div>
-
-                <div className={styles.info}>
-                    <div className={styles.infoItem}>
-                        <span className={styles.icon}>📍</span>
-                        <span>{restaurant.address}</span>
-                    </div>
-                    {restaurant.phone && (
-                        <div className={styles.infoItem}>
-                            <span className={styles.icon}>📞</span>
-                            <a href={`tel:${restaurant.phone}`}>{restaurant.phone}</a>
-                        </div>
-                    )}
-                    {restaurant.openingHours && (
-                        <div className={styles.infoItem}>
-                            <span className={styles.icon}>🕐</span>
-                            <span>{restaurant.openingHours}</span>
-                        </div>
-                    )}
-                </div>
-
-                <div className={styles.tabs}>
-                    <button
-                        className={`${styles.tab} ${activeTab === 'menu' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('menu')}
-                    >
-                        메뉴 ({menus.length})
-                    </button>
-                    <button
-                        className={`${styles.tab} ${activeTab === 'review' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('review')}
-                    >
-                        리뷰 ({reviews.length})
-                    </button>
-                </div>
-
-                <div className={styles.content}>
-                    {activeTab === 'menu' && menusLoading ? (
-                        <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                            메뉴를 불러오는 중입니다...
-                        </p>
-                    ) : (
-                        activeTab === 'menu' && <MenuList menus={menus} />
-                    )}
-                    
-                    {activeTab === 'review' && reviewsLoading ? (
-                        <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-                            리뷰를 불러오는 중입니다...
-                        </p>
-                    ) : (
-                        activeTab === 'review' && (
-                            <ReviewList 
-                                reviews={reviews} 
-                                isLoggedIn={!!user}
-                                onSubmitReview={handleSubmitReview}
-                            />
-                        )
-                    )}
-                </div>
-            </div>
+        {/* 헤더 */}
+        <div className={styles.header}>
+          <div className={styles.titleSection}>
+            <h2 className={styles.name}>{restaurant.name}</h2>
+            <button
+              onClick={handleBookmarkClick}
+              className={`${styles.bookmarkButton} ${isBookmarked ? styles.bookmarked : ''}`}
+              aria-label={isBookmarked ? '찜 해제' : '찜하기'}
+              disabled={bookmarkLoading}
+            >
+              {bookmarkLoading ? '-' : isBookmarked ? '❤️' : '🤍'}
+            </button>
+          </div>
+          {!restaurant.thumbnailUrl && (
+            <button onClick={onClose} className={styles.closeButton}>
+              ✕
+            </button>
+          )}
         </div>
-    );
+
+        {/* 정보 섹션 */}
+        <div className={styles.info}>
+          <div className={styles.infoItem}>
+            <span className={styles.icon}>📍</span>
+            <span>{restaurant.address}</span>
+          </div>
+          {restaurant.phone && (
+            <div className={styles.infoItem}>
+              <span className={styles.icon}>📞</span>
+              <a href={`tel:${restaurant.phone}`}>{restaurant.phone}</a>
+            </div>
+          )}
+          {restaurant.openingHours && (
+            <div className={styles.infoItem}>
+              <span className={styles.icon}>🕐</span>
+              <span>{restaurant.openingHours}</span>
+            </div>
+          )}
+        </div>
+
+        {/* 탭 */}
+        <div className={styles.tabs}>
+          <button
+            className={`${styles.tab} ${activeTab === 'menu' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('menu')}
+          >
+            메뉴 ({menus.length})
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'review' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('review')}
+          >
+            리뷰 ({reviews.length})
+          </button>
+        </div>
+
+        {/* 컨텐츠 */}
+        <div className={styles.content}>
+          {activeTab === 'menu' && (
+            menusLoading ? (
+              <p className={styles.loadingText}>메뉴를 불러오는 중입니다...</p>
+            ) : (
+              <MenuList menus={menus} />
+            )
+          )}
+          
+          {activeTab === 'review' && (
+            reviewsLoading ? (
+              <p className={styles.loadingText}>리뷰를 불러오는 중입니다...</p>
+            ) : (
+              <ReviewList 
+                reviews={reviews} 
+                isLoggedIn={!!user}
+                onSubmitReview={handleSubmitReview}
+              />
+            )
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default RestaurantDetail;
