@@ -25,13 +25,50 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState('');
 
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+  const formatDate = (dateString: string | null | undefined): string => {
+    if (!dateString || dateString === 'null' || dateString === '') {
+      return '';
+    }
+    
+    try {
+      // ISO 8601 형식의 날짜 문자열 파싱
+      const date = new Date(dateString);
+      
+      // 유효하지 않은 날짜인지 확인
+      if (isNaN(date.getTime())) {
+        console.warn('유효하지 않은 날짜:', dateString);
+        return '';
+      }
+      
+      // 날짜가 너무 오래된 경우 (1970년 이전) 무시
+      if (date.getFullYear() < 1970) {
+        console.warn('날짜가 너무 오래됨:', dateString);
+        return '';
+      }
+      
+      // 한국어 형식으로 포맷팅
+      return date.toLocaleDateString('ko-KR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch (error) {
+      console.error('날짜 포맷 오류:', error, dateString);
+      return '';
+    }
+  };
+
+  const getDisplayDate = (review: Review): string => {
+    // updatedAt이 있고 유효한 날짜인 경우
+    if (review.updatedAt && review.updatedAt !== 'null' && review.updatedAt !== '') {
+      const updatedDate = formatDate(review.updatedAt);
+      if (updatedDate) {
+        return updatedDate;
+      }
+    }
+    
+    // createdAt 사용
+    return formatDate(review.createdAt);
   };
 
   const handleEdit = (review: Review) => {
@@ -156,7 +193,9 @@ const ReviewsList = ({ reviews, onDelete, onUpdate }: ReviewsListProps) => {
 
             {/* 메타 정보 및 액션 버튼 */}
             <div className={styles.footer}>
-              <span className={styles.date}>{formatDate(review.createdAt)}</span>
+              <span className={styles.date}>
+                {getDisplayDate(review)}
+              </span>
               {editingId !== review.id && (
                 <div className={styles.actions}>
                   <button 

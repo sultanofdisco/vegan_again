@@ -284,35 +284,75 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
     };
 
     const uploadImage = async (file: File, userId: number): Promise<string | null> => {
-        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
+        // 파일 크기 검증
         if (file.size > MAX_FILE_SIZE) {
-            console.error(`❌ 파일이 너무 큽니다: ${file.name}`);
+            console.error(`❌ 파일이 너무 큽니다: ${file.name}, 크기: ${file.size}`);
             alert(`${file.name}은(는) 5MB를 초과합니다.`);
             return null;
         }
 
-        const fileExtension = file.name.split('.').pop();
+        // 파일 타입 검증
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            console.error(`❌ 허용되지 않는 파일 타입: ${file.type}`);
+            alert('JPEG, PNG, GIF, WEBP 형식의 이미지만 업로드할 수 있습니다.');
+            return null;
+        }
+
+        const fileExtension = file.name.split('.').pop()?.toLowerCase();
+        if (!fileExtension || !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
+            console.error(`❌ 허용되지 않는 파일 확장자: ${fileExtension}`);
+            alert('허용되지 않는 파일 확장자입니다.');
+            return null;
+        }
+
         const path = `${userId}/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExtension}`;
         
         try {
-            const { error: uploadError } = await supabase.storage
+            console.log('📤 [Image Upload] 업로드 시작:', { fileName: file.name, fileSize: file.size, path });
+            
+            const { data: uploadData, error: uploadError } = await supabase.storage
                 .from('review_images')
                 .upload(path, file, {
                     cacheControl: '3600',
                     upsert: false,
                 });
 
-            if (uploadError) throw uploadError;
+            if (uploadError) {
+                console.error('❌ [Image Upload Error]:', uploadError);
+                throw uploadError;
+            }
 
-            const { data } = supabase.storage
+            console.log('✅ [Image Upload] 업로드 성공:', uploadData);
+
+            const { data: urlData } = supabase.storage
                 .from('review_images')
                 .getPublicUrl(path);
 
-            return data.publicUrl;
+            const publicUrl = urlData.publicUrl;
+            console.log('✅ [Image Upload] Public URL:', publicUrl);
 
-        } catch (error) {
+            return publicUrl;
+
+        } catch (error: any) {
             console.error('❌ [Image Upload Error]:', error);
+            console.error('❌ [Image Upload Error Details]:', {
+                message: error.message,
+                statusCode: error.statusCode,
+                error: error.error
+            });
+            
+            // 에러 메시지에 따라 사용자에게 알림
+            if (error.message?.includes('Bucket not found')) {
+                alert('이미지 저장소를 찾을 수 없습니다. 관리자에게 문의해주세요.');
+            } else if (error.message?.includes('new row violates row-level security')) {
+                alert('이미지 업로드 권한이 없습니다. 로그인 상태를 확인해주세요.');
+            } else {
+                alert(`이미지 업로드에 실패했습니다: ${error.message || '알 수 없는 오류'}`);
+            }
+            
             return null;
         }
     };
@@ -326,6 +366,7 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
         try {
             let imageUrl: string | null = null;
 
+            // 이미지가 있으면 먼저 Supabase Storage에 업로드
             if (image) {
                 console.log('📝 [Submit Review] 이미지 업로드 시작...');
                 imageUrl = await uploadImage(image, user.user_id);
@@ -334,26 +375,32 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
                     console.log('✅ [Image Upload Success]:', imageUrl);
                 } else {
                     console.warn('⚠️ [Image Upload Failed]');
+                    alert('이미지 업로드에 실패했습니다. 이미지 없이 리뷰를 등록하시겠습니까?');
+                    return;
                 }
             }
 
-            const { error } = await supabase
-                .from('reviews')
-                .insert({
-                    user_id: user.user_id,
-                    restaurant_id: restaurantId,
-                    content: content,
-                    rating: rating,
-                    image_url: imageUrl,
-                });
+            // 백엔드 API를 통해 리뷰 작성
+            const response = await apiClient.post(`/restaurants/${restaurantId}/reviews`, {
+                title: content.substring(0, 100), // 제목은 내용의 처음 100자
+                content: content,
+                rating: rating,
+                image: imageUrl || undefined, // 이미지 URL이 있으면 전송
+            });
 
-            if (error) throw error;
-            
-            await fetchReviews(restaurantId);
+            if (response.data.success) {
+                console.log('✅ [Review Submit Success]');
+                // 리뷰 목록 새로고침
+                await fetchReviews(restaurantId);
+                alert('리뷰가 등록되었습니다.');
+            } else {
+                throw new Error(response.data.error || '리뷰 등록 실패');
+            }
 
-        } catch (error) {
+        } catch (error: any) {
             console.error('❌ [Submit Review Error]:', error);
-            alert('리뷰 등록 중 오류가 발생했습니다. 다시 시도해주세요.');
+            const errorMessage = error.response?.data?.error || error.message || '리뷰 등록 중 오류가 발생했습니다.';
+            alert(errorMessage);
             throw error;
         }
     };

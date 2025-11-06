@@ -698,3 +698,214 @@ postgrest.exceptions.APIError: {'code': '42703', 'details': None, 'hint': None, 
 2025-11-07 00:24:07,374 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:24:07] "GET /api/users/reviews HTTP/1.1" 200 -
 2025-11-07 00:24:18,008 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:24:18] "GET /api/users/bookmarks HTTP/1.1" 200 -
 2025-11-07 00:24:18,241 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:24:18] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:24:51,692 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:24:51] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:24:51,921 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:24:51] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:24:51,960 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:24:51] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:24:52,210 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:24:52] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:24:53,547 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:24:53] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:24:54,273 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:24:54] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:28:18,654 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:28:18,794 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:28:20,164 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:28:20,178 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:28:28,038 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:28:28,166 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:28:29,369 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:28:29,378 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:28:37,318 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:28:37,446 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:28:38,641 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:28:38,648 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:28:48,515 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:28:48,615 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:28:49,536 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:28:49,543 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:28:59,541 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:28:59] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 00:29:01,861 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:29:01] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:29:02,089 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:29:02] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:29:53,587 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:29:53,712 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:29:54,711 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:29:54,721 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:30:01,814 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:30:01,894 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:30:02,729 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:30:02,736 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:30:04,922 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:30:05,026 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:30:05,794 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:30:05,799 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:30:21,732 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 00:30:21,733 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 00:30:21,734 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:30:22,486 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:30:22,492 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:30:37,610 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:30:37] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 00:30:39,526 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:30:39] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:30:39,794 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:30:39] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:30:43,189 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:30:43] "[35m[1mPOST /api/users/bookmarks/57 HTTP/1.1[0m" 201 -
+2025-11-07 00:30:43,422 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:30:43] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:33:14,321 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 00:33:14,321 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 00:33:14,322 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:33:15,166 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:33:15,172 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:33:33,541 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:33:33] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 00:33:37,005 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:33:37] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:33:37,251 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:33:37] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:40:18,414 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\config.py', reloading
+2025-11-07 00:40:18,541 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:40:19,483 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:40:19,490 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:40:25,986 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:40:26,090 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:40:27,284 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:40:27,292 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:40:31,508 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:40:31,619 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:40:32,594 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:40:32,607 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:40:44,699 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:40:44,785 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:40:45,678 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:40:45,685 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:47:51,799 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:47:51,908 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:47:52,783 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:47:52,789 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:49:47,609 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\config.py', reloading
+2025-11-07 00:49:47,700 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:49:48,434 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:49:48,439 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:50:07,058 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:50:07] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 00:50:11,365 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:50:11] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:50:11,629 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:50:11] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:50:29,729 - app.routes.reviews - ERROR - 식당 존재 확인 오류: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+Traceback (most recent call last):
+  File "C:\Users\user\vegan_again\backend\app\routes\reviews.py", line 385, in check_restaurant_exists
+    .execute()
+     ~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\postgrest\_sync\request_builder.py", line 70, in execute
+    raise APIError(r.json())
+postgrest.exceptions.APIError: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+2025-11-07 00:50:29,733 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:50:29] "[33mPOST /api/restaurants/28/reviews HTTP/1.1[0m" 404 -
+2025-11-07 00:50:38,908 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:50:38] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:50:39,133 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:50:39] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:50:48,338 - app.routes.reviews - ERROR - 식당 존재 확인 오류: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+Traceback (most recent call last):
+  File "C:\Users\user\vegan_again\backend\app\routes\reviews.py", line 385, in check_restaurant_exists
+    .execute()
+     ~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\postgrest\_sync\request_builder.py", line 70, in execute
+    raise APIError(r.json())
+postgrest.exceptions.APIError: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+2025-11-07 00:50:48,340 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:50:48] "[33mPOST /api/restaurants/9/reviews HTTP/1.1[0m" 404 -
+2025-11-07 00:51:29,085 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:29] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:51:29,321 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:29] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:51:37,018 - app.routes.reviews - ERROR - 식당 존재 확인 오류: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+Traceback (most recent call last):
+  File "C:\Users\user\vegan_again\backend\app\routes\reviews.py", line 385, in check_restaurant_exists
+    .execute()
+     ~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\postgrest\_sync\request_builder.py", line 70, in execute
+    raise APIError(r.json())
+postgrest.exceptions.APIError: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+2025-11-07 00:51:37,020 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:37] "[33mPOST /api/restaurants/34/reviews HTTP/1.1[0m" 404 -
+2025-11-07 00:51:40,959 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:40] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:51:41,194 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:41] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:51:41,574 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:41] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:51:42,261 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:42] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:51:42,748 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:42] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:51:43,414 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:43] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:51:59,367 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:51:59] "DELETE /api/reviews/1 HTTP/1.1" 200 -
+2025-11-07 00:52:00,015 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:52:00] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:52:18,552 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:52:18] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:52:19,150 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:52:19] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:52:24,641 - app.routes.reviews - ERROR - 식당 존재 확인 오류: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+Traceback (most recent call last):
+  File "C:\Users\user\vegan_again\backend\app\routes\reviews.py", line 385, in check_restaurant_exists
+    .execute()
+     ~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\postgrest\_sync\request_builder.py", line 70, in execute
+    raise APIError(r.json())
+postgrest.exceptions.APIError: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+2025-11-07 00:52:24,643 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:52:24] "[33mPOST /api/restaurants/16/reviews HTTP/1.1[0m" 404 -
+2025-11-07 00:52:38,350 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\config.py', reloading
+2025-11-07 00:52:38,466 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:52:39,302 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:52:39,308 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:53:15,107 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 00:53:15,107 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 00:53:15,109 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:53:15,972 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:53:15,978 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:53:23,911 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:53:23] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 00:53:25,768 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:53:25] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:53:26,000 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:53:26] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:53:34,989 - app.routes.reviews - ERROR - 식당 존재 확인 오류: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+Traceback (most recent call last):
+  File "C:\Users\user\vegan_again\backend\app\routes\reviews.py", line 290, in check_restaurant_exists
+    .execute()
+     ~~~~~~~^^
+  File "C:\Users\user\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\postgrest\_sync\request_builder.py", line 70, in execute
+    raise APIError(r.json())
+postgrest.exceptions.APIError: {'code': '42703', 'details': None, 'hint': None, 'message': 'column restaurants.id does not exist'}
+2025-11-07 00:53:34,993 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:53:34] "[33mPOST /api/restaurants/97/reviews HTTP/1.1[0m" 404 -
+2025-11-07 00:55:54,447 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:55:54,547 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:55:55,450 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:55:55,456 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:56:04,583 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:56:04,711 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:56:05,631 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:56:05,638 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:56:11,943 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:56:12,027 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:56:12,819 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:56:12,825 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:56:21,798 - werkzeug - INFO -  * Detected change in 'C:\\Users\\user\\vegan_again\\backend\\app\\routes\\reviews.py', reloading
+2025-11-07 00:56:21,909 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:56:22,859 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:56:22,865 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:56:36,656 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-11-07 00:56:36,656 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-11-07 00:56:36,657 - werkzeug - INFO -  * Restarting with stat
+2025-11-07 00:56:37,395 - werkzeug - WARNING -  * Debugger is active!
+2025-11-07 00:56:37,400 - werkzeug - INFO -  * Debugger PIN: 471-465-890
+2025-11-07 00:57:00,135 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:00] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 00:57:03,579 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:03] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:57:03,805 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:03] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:57:07,433 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:07] "[35m[1mPOST /api/users/bookmarks/100 HTTP/1.1[0m" 201 -
+2025-11-07 00:57:07,668 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:07] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:57:14,845 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:14] "[35m[1mPOST /api/restaurants/100/reviews HTTP/1.1[0m" 201 -
+2025-11-07 00:57:24,239 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:24] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:57:24,476 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:24] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:57:24,515 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:24] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:57:24,738 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:24] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:57:25,182 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:25] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:57:25,811 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:25] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:57:29,732 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:29] "DELETE /api/reviews/3 HTTP/1.1" 200 -
+2025-11-07 00:57:30,393 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:30] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:57:49,316 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:49] "POST /api/auth/login HTTP/1.1" 200 -
+2025-11-07 00:57:51,197 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:51] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:57:51,436 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:51] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:57:51,475 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:51] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:57:51,706 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:51] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:57:52,140 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:52] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:57:52,801 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:57:52] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:58:54,860 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:58:54] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:58:55,116 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:58:55] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:58:55,799 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:58:55] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:59:02,435 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:59:02] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:59:02,659 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:59:02] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:59:03,319 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:59:03] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:59:26,362 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:59:26] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:59:26,594 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:59:26] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:59:27,228 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:59:27] "GET /api/users/reviews HTTP/1.1" 200 -
+2025-11-07 00:59:40,416 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:59:40] "GET /api/users/profile HTTP/1.1" 200 -
+2025-11-07 00:59:40,634 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:59:40] "GET /api/users/bookmarks HTTP/1.1" 200 -
+2025-11-07 00:59:41,285 - werkzeug - INFO - 127.0.0.1 - - [07/Nov/2025 00:59:41] "GET /api/users/reviews HTTP/1.1" 200 -

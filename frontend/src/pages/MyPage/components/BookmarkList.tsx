@@ -113,7 +113,16 @@ const BookmarksList = ({ bookmarks, onRemove }: BookmarksListProps) => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                const restaurantId = bookmark.restaurant_id || bookmark.restaurant.id;
+                // 북마크의 restaurant_id를 우선 사용, 없으면 restaurant 객체에서 가져오기
+                // 백엔드에서 조인된 restaurants 객체는 restaurant_id를 가질 수 있음
+                const restaurantId = bookmark.restaurant_id || 
+                                     (bookmark.restaurant as any)?.restaurant_id || 
+                                     bookmark.restaurant?.id;
+                if (!restaurantId) {
+                  console.error('restaurant_id를 찾을 수 없습니다:', bookmark);
+                  alert('북마크 데이터 오류가 발생했습니다.');
+                  return;
+                }
                 onRemove(bookmark.id, restaurantId);
               }}
               className={styles.removeButton}

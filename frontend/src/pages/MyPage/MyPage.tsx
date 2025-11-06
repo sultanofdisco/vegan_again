@@ -75,7 +75,11 @@ const MyPage = () => {
         
         const formattedBookmarks = bookmarksResponse.data.data.map((item: any) => {
           const restaurant = item.restaurants || item.restaurant;
+          // restaurant_id는 favorites 테이블의 컬럼에서 직접 가져오기
           const restaurantId = item.restaurant_id;
+          
+          // restaurant 객체가 있으면 restaurant_id도 확인 (restaurant.restaurant_id 또는 restaurant.id)
+          const restaurantObjectId = restaurant?.restaurant_id || restaurant?.id;
           
           // 디버깅: 데이터 구조 확인
           if (!restaurantId) {
@@ -84,18 +88,19 @@ const MyPage = () => {
           if (!restaurant) {
             console.warn('restaurant 객체가 없는 북마크:', item);
           }
-          if (restaurant && restaurant.id !== restaurantId) {
+          if (restaurant && restaurantObjectId && restaurantObjectId !== restaurantId) {
             console.warn('restaurant_id 불일치:', {
               item_id: item.id,
-              restaurant_id: restaurantId,
-              restaurant_object_id: restaurant.id
+              favorites_restaurant_id: restaurantId,
+              restaurant_object_id: restaurantObjectId,
+              restaurant_object: restaurant
             });
           }
           
           return {
             id: item.id,
             restaurant: restaurant || null,
-            restaurant_id: restaurantId,
+            restaurant_id: restaurantId, // favorites 테이블의 restaurant_id를 우선 사용
             created_at: item.created_at,
           };
         }).filter((bookmark: any) => bookmark.restaurant_id && bookmark.restaurant);
@@ -233,12 +238,21 @@ const MyPage = () => {
         return;
       }
 
-      // restaurant_id 검증
-      const bookmarkRestaurantId = bookmark.restaurant_id || bookmark.restaurant?.id;
+      // restaurant_id 검증 (여러 소스 확인)
+      // 백엔드에서 조인된 restaurants 객체는 restaurant_id를 가질 수 있지만, 프론트엔드 타입은 id로 매핑됨
+      const bookmarkRestaurantId = bookmark.restaurant_id || 
+                                    (bookmark.restaurant as any)?.restaurant_id || 
+                                    bookmark.restaurant?.id;
+      
+      // 검증: 전달된 restaurantId와 북마크의 restaurant_id가 일치하는지 확인
+      // 단, restaurant 객체의 id와 다를 수 있으므로 북마크의 restaurant_id를 우선 사용
       if (bookmarkRestaurantId !== restaurantId) {
         console.error('restaurant_id 불일치:', {
           전달된restaurantId: restaurantId,
-          북마크의restaurantId: bookmarkRestaurantId,
+          북마크의restaurant_id: bookmark.restaurant_id,
+          restaurant객체의id: bookmark.restaurant?.id,
+          restaurant객체의restaurant_id: (bookmark.restaurant as any)?.restaurant_id,
+          최종확인된값: bookmarkRestaurantId,
           bookmark
         });
         alert('북마크 데이터가 일치하지 않습니다. 페이지를 새로고침해주세요.');

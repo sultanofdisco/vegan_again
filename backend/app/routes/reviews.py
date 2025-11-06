@@ -285,8 +285,8 @@ def check_restaurant_exists(restaurant_id):
     """식당 존재 확인"""
     try:
         result = supabase.table('restaurants') \
-            .select('id') \
-            .eq('id', restaurant_id) \
+            .select('restaurant_id') \
+            .eq('restaurant_id', restaurant_id) \
             .execute()
         
         return bool(result.data)
@@ -365,12 +365,12 @@ def get_user_reviews(user_id):
         if restaurant_ids:
             try:
                 restaurants_result = supabase.table('restaurants') \
-                    .select('id, name') \
-                    .in_('id', restaurant_ids) \
+                    .select('restaurant_id, name') \
+                    .in_('restaurant_id', restaurant_ids) \
                     .execute()
                 
                 if restaurants_result.data:
-                    restaurants_map = {r.get('id'): r.get('name', '알 수 없음') for r in restaurants_result.data}
+                    restaurants_map = {r.get('restaurant_id'): r.get('name', '알 수 없음') for r in restaurants_result.data}
             except Exception as e:
                 logger.warning(f"식당 정보 일괄 조회 실패: {str(e)}")
         
@@ -381,6 +381,48 @@ def get_user_reviews(user_id):
                 restaurant_id = item.get('restaurant_id')
                 restaurant_name = restaurants_map.get(restaurant_id, '알 수 없음')
                 
+                # 날짜 형식 확인 및 변환 (ISO 8601 형식으로 보장)
+                created_at = item.get('created_at')
+                updated_at = item.get('updated_at')
+                
+                # created_at 처리
+                created_at_str = None
+                if created_at:
+                    if isinstance(created_at, str):
+                        # 문자열인 경우 그대로 사용 (이미 ISO 형식일 가능성)
+                        created_at_str = created_at if created_at.strip() else None
+                    elif isinstance(created_at, datetime):
+                        # datetime 객체인 경우 ISO 형식으로 변환
+                        created_at_str = created_at.isoformat()
+                    else:
+                        # 다른 타입인 경우 문자열로 변환 시도
+                        try:
+                            created_at_str = str(created_at) if created_at else None
+                        except:
+                            created_at_str = None
+                
+                # updated_at 처리
+                updated_at_str = None
+                if updated_at:
+                    if isinstance(updated_at, str):
+                        # 문자열인 경우 그대로 사용 (이미 ISO 형식일 가능성)
+                        updated_at_str = updated_at if updated_at.strip() else None
+                    elif isinstance(updated_at, datetime):
+                        # datetime 객체인 경우 ISO 형식으로 변환
+                        updated_at_str = updated_at.isoformat()
+                    else:
+                        # 다른 타입인 경우 문자열로 변환 시도
+                        try:
+                            updated_at_str = str(updated_at) if updated_at else None
+                        except:
+                            updated_at_str = None
+                
+                # 로깅 (디버깅용)
+                if created_at_str:
+                    logger.debug(f"리뷰 {item.get('review_id')} - created_at: {created_at_str}")
+                if updated_at_str:
+                    logger.debug(f"리뷰 {item.get('review_id')} - updated_at: {updated_at_str}")
+                
                 review_data = {
                     "id": item.get('review_id'),
                     "restaurantId": restaurant_id,
@@ -388,8 +430,8 @@ def get_user_reviews(user_id):
                     "content": item.get('content', ''),
                     "rating": item.get('rating'),
                     "images": [item.get('image_url')] if item.get('image_url') else [],
-                    "createdAt": item.get('created_at'),
-                    "updatedAt": item.get('updated_at')
+                    "createdAt": created_at_str,
+                    "updatedAt": updated_at_str
                 }
                 reviews.append(review_data)
         
