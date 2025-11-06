@@ -26,24 +26,24 @@ def debug_and_save(driver, place_name, error_context="unknown"):
         driver.save_screenshot(screenshot_path)
         with open(page_path, "w", encoding="utf-8") as f:
             f.write(driver.page_source)
-        print("⚠️ 에러 발생. 디버그 파일 생성:")
+        print("에러 발생. 디버그 파일 생성:")
         print(f" - 스크린샷: {screenshot_path}")
         print(f" - HTML: {page_path}")
     except Exception as e:
         print(f"디버그 파일 저장 실패: {e}")
 
 def try_scroll_load(driver, attempts=10, delay=0.5):
-    print("📜 메뉴 전체 로드를 위해 스크롤 시도...")
+    print("메뉴 전체 로드를 위해 스크롤 시도...")
     last_height = driver.execute_script("return document.body.scrollHeight")
     for i in range(attempts):
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         time.sleep(delay)
         new_height = driver.execute_script("return document.body.scrollHeight")
         if new_height == last_height:
-            print(f"📜 {i+1}회 스크롤 후 높이 변경 없음. 로딩 완료 추정.")
+            print(f"{i+1}회 스크롤 후 높이 변경 없음. 로딩 완료 추정.")
             break
         last_height = new_height
-    print("📜 스크롤 완료.")
+    print("스크롤 완료.")
 
 
 def search_place_and_get_menu(place_name):
