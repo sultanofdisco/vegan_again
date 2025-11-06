@@ -99,15 +99,14 @@ const convertApiRestaurantToRestaurant = (item: ApiRestaurant): Restaurant => {
   const longitude = item.longitude || 126.9780;
 
   if (latitude < -90 || latitude > 90) {
-    console.warn(`⚠️ 유효하지 않은 위도: ${latitude}, 기본값 사용`);
+    console.warn(`유효하지 않은 위도: ${latitude}, 기본값 사용`);
   }
 
   if (longitude < -180 || longitude > 180) {
-    console.warn(`⚠️ 유효하지 않은 경도: ${longitude}, 기본값 사용`);
+    console.warn(`유효하지 않은 경도: ${longitude}, 기본값 사용`);
   }
 
   return {
-    // 🚨 수정: 'restaurant_id'를 UI의 'id'로 매핑
     id: item.restaurant_id, 
     name: item.name,
     address: item.address,
@@ -118,7 +117,6 @@ const convertApiRestaurantToRestaurant = (item: ApiRestaurant): Restaurant => {
     phone: item.phone || undefined,
     category: convertCategory(item.category),
     
-    // 🚨 수정: 'business_hours'를 UI의 'openingHours'로 매핑
     openingHours: item.business_hours || undefined, 
     closedDays: [],
     menus: [],
@@ -128,7 +126,6 @@ const convertApiRestaurantToRestaurant = (item: ApiRestaurant): Restaurant => {
     thumbnailUrl: item.thumbnailUrl || undefined,
     imageUrls: Array.isArray(item.image_urls) ? item.image_urls : [],
     
-    // 🚨 수정: 'data_source', 'created_at', 'updated_at' 매핑
     dataSource: item.data_source || undefined, 
     createdAt: item.created_at || new Date().toISOString(), 
     updatedAt: item.updated_at || new Date().toISOString(), 
@@ -145,22 +142,12 @@ export const searchRestaurants = async (
       ? categories.map(cat => convertCategoryToBackend(cat)).join(',')
       : '';
       
-    console.log('🔍 [API] 검색 요청:', { keyword, categories, categoryParam });
-
     const response = await apiClient.get<ApiResponse>('/search', {
       params: {
         keyword: keyword.trim(),
         category: categoryParam,
       },
     });
-
-    console.log('✅ [API] 응답:', response.data);
-
-    // 🔍 추가: 첫 번째 식당의 원본 데이터 확인
-    if (response.data.data.length > 0) {
-      console.log('🖼️ 첫 번째 식당 원본 데이터:', response.data.data[0]);
-      console.log('🖼️ thumbnail_url 값:', response.data.data[0].thumbnailUrl);
-    }
 
     if (!response.data.success) {
       throw new Error(response.data.error || '검색 실패');
@@ -176,11 +163,6 @@ export const searchRestaurants = async (
       
       try {
         const restaurant = convertApiRestaurantToRestaurant(item as ApiRestaurant);
-        // 🔍 추가: 변환 후 thumbnailUrl 확인
-        console.log('🖼️ 변환 후:', {
-          name: restaurant.name,
-          thumbnailUrl: restaurant.thumbnailUrl
-        });
         
         restaurants.push(restaurant);
       } catch (error) {
