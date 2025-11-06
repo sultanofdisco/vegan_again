@@ -19,9 +19,9 @@ export interface UserProfile {
 }
 
 export interface UserFromDB {
-  user_id: number;                 
+  user_id: string;                 
   email: string;
-  password_hash: string;
+  password_hash?: string;
   nickname: string;
   profile_image_url: string | null;
   bio: string | null;
@@ -33,7 +33,7 @@ export interface UserFromDB {
 
 export function mapUserFromDB(dbUser: UserFromDB): UserProfile {
   return {
-    id: String(dbUser.user_id),     
+    id: dbUser.user_id,    
     email: dbUser.email,
     nickname: dbUser.nickname,
     profile_image_url: dbUser.profile_image_url ?? undefined,
