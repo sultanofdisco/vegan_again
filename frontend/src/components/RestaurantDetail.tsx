@@ -196,11 +196,11 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
                             (item.restaurants && item.restaurants.id) ||
                             (item.restaurant && item.restaurant.id);
                         return restaurantIdFromItem === restaurantId;
-                    }
+            }
                 );
-                
+    
                 if (bookmark) {
-                    setIsBookmarked(true);
+                setIsBookmarked(true);
                     setBookmarkId(bookmark.id);
                 } else {
                     setIsBookmarked(false);
@@ -227,12 +227,12 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
         try {
             // 백엔드 API로 북마크 추가
             const response = await apiClient.post(`/users/bookmarks/${restaurantId}`);
-            
+    
             if (response.data.success) {
                 setIsBookmarked(true);
                 // 북마크 ID는 백엔드에서 반환하지 않으므로 상태 확인으로 다시 조회
-                await checkBookmarkStatus();
-                alert('찜 목록에 추가되었습니다!');
+                    await checkBookmarkStatus();
+            alert('찜 목록에 추가되었습니다!');
             } else {
                 throw new Error(response.data.error || '북마크 추가 실패');
             }
@@ -260,9 +260,9 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
             const response = await apiClient.delete(`/users/bookmarks/${restaurantId}`);
 
             if (response.data.success) {
-                setIsBookmarked(false);
-                setBookmarkId(null);
-                alert('찜 해제되었습니다.');
+            setIsBookmarked(false);
+            setBookmarkId(null);
+            alert('찜 해제되었습니다.');
             } else {
                 throw new Error(response.data.error || '북마크 삭제 실패');
             }
@@ -283,78 +283,18 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
         }
     };
 
-    const uploadImage = async (file: File, userId: number): Promise<string | null> => {
-        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-
-        // 파일 크기 검증
-        if (file.size > MAX_FILE_SIZE) {
-            console.error(`❌ 파일이 너무 큽니다: ${file.name}, 크기: ${file.size}`);
-            alert(`${file.name}은(는) 5MB를 초과합니다.`);
-            return null;
-        }
-
-        // 파일 타입 검증
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-        if (!allowedTypes.includes(file.type)) {
-            console.error(`❌ 허용되지 않는 파일 타입: ${file.type}`);
-            alert('JPEG, PNG, GIF, WEBP 형식의 이미지만 업로드할 수 있습니다.');
-            return null;
-        }
-
-        const fileExtension = file.name.split('.').pop()?.toLowerCase();
-        if (!fileExtension || !['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension)) {
-            console.error(`❌ 허용되지 않는 파일 확장자: ${fileExtension}`);
-            alert('허용되지 않는 파일 확장자입니다.');
-            return null;
-        }
-
-        const path = `${userId}/${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExtension}`;
-        
-        try {
-            console.log('📤 [Image Upload] 업로드 시작:', { fileName: file.name, fileSize: file.size, path });
-            
-            const { data: uploadData, error: uploadError } = await supabase.storage
-                .from('review_images')
-                .upload(path, file, {
-                    cacheControl: '3600',
-                    upsert: false,
-                });
-
-            if (uploadError) {
-                console.error('❌ [Image Upload Error]:', uploadError);
-                throw uploadError;
-            }
-
-            console.log('✅ [Image Upload] 업로드 성공:', uploadData);
-
-            const { data: urlData } = supabase.storage
-                .from('review_images')
-                .getPublicUrl(path);
-
-            const publicUrl = urlData.publicUrl;
-            console.log('✅ [Image Upload] Public URL:', publicUrl);
-
-            return publicUrl;
-
-        } catch (error: any) {
-            console.error('❌ [Image Upload Error]:', error);
-            console.error('❌ [Image Upload Error Details]:', {
-                message: error.message,
-                statusCode: error.statusCode,
-                error: error.error
-            });
-            
-            // 에러 메시지에 따라 사용자에게 알림
-            if (error.message?.includes('Bucket not found')) {
-                alert('이미지 저장소를 찾을 수 없습니다. 관리자에게 문의해주세요.');
-            } else if (error.message?.includes('new row violates row-level security')) {
-                alert('이미지 업로드 권한이 없습니다. 로그인 상태를 확인해주세요.');
-            } else {
-                alert(`이미지 업로드에 실패했습니다: ${error.message || '알 수 없는 오류'}`);
-            }
-            
-            return null;
-        }
+    const convertImageToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = reader.result as string;
+                resolve(result);
+            };
+            reader.onerror = (error) => {
+                reject(error);
+            };
+            reader.readAsDataURL(file);
+        });
     };
 
     const handleSubmitReview = async (content: string, image: File | null, rating: number) => {
@@ -364,34 +304,48 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
         }
 
         try {
-            let imageUrl: string | null = null;
+            let imageBase64: string | undefined = undefined;
 
-            // 이미지가 있으면 먼저 Supabase Storage에 업로드
+            // 이미지가 있으면 Base64로 변환
             if (image) {
-                console.log('📝 [Submit Review] 이미지 업로드 시작...');
-                imageUrl = await uploadImage(image, user.user_id);
+                console.log('📝 [Submit Review] 이미지 변환 시작...');
                 
-                if (imageUrl) {
-                    console.log('✅ [Image Upload Success]:', imageUrl);
-                } else {
-                    console.warn('⚠️ [Image Upload Failed]');
-                    alert('이미지 업로드에 실패했습니다. 이미지 없이 리뷰를 등록하시겠습니까?');
+                // 파일 크기 검증 (5MB)
+                const MAX_FILE_SIZE = 5 * 1024 * 1024;
+                if (image.size > MAX_FILE_SIZE) {
+                    alert('이미지 크기는 5MB를 초과할 수 없습니다.');
+                    return;
+                }
+
+                // 파일 타입 검증
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                if (!allowedTypes.includes(image.type)) {
+                    alert('JPEG, PNG, GIF, WEBP 형식의 이미지만 업로드할 수 있습니다.');
+                    return;
+                }
+
+                try {
+                    imageBase64 = await convertImageToBase64(image);
+                    console.log('✅ [Image Convert Success]');
+                } catch (error) {
+                    console.error('❌ [Image Convert Error]:', error);
+                    alert('이미지 변환에 실패했습니다. 다시 시도해주세요.');
                     return;
                 }
             }
 
-            // 백엔드 API를 통해 리뷰 작성
+            // 백엔드 API를 통해 리뷰 작성 (백엔드에서 Storage에 업로드)
             const response = await apiClient.post(`/restaurants/${restaurantId}/reviews`, {
                 title: content.substring(0, 100), // 제목은 내용의 처음 100자
-                content: content,
-                rating: rating,
-                image: imageUrl || undefined, // 이미지 URL이 있으면 전송
-            });
+                    content: content,
+                    rating: rating,
+                image: imageBase64, // Base64 이미지 전송 (백엔드에서 Storage에 업로드)
+                });
 
             if (response.data.success) {
                 console.log('✅ [Review Submit Success]');
                 // 리뷰 목록 새로고침
-                await fetchReviews(restaurantId);
+            await fetchReviews(restaurantId);
                 alert('리뷰가 등록되었습니다.');
             } else {
                 throw new Error(response.data.error || '리뷰 등록 실패');

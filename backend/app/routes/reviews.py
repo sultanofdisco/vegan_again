@@ -281,6 +281,96 @@ def check_review_ownership(review_id, user_id):
         return False, None
 
 
+def upload_image_to_storage(image_base64: str, user_id: int) -> str | None:
+    """
+    Base64 이미지를 Supabase Storage에 업로드하고 Public URL 반환
+    """
+    try:
+        import base64
+        
+        # Base64 데이터 추출
+        if not image_base64.startswith('data:image/'):
+            logger.error(f"잘못된 Base64 형식: {image_base64[:50]}...")
+            return None
+        
+        # MIME 타입 추출
+        mime_match = re.match(r'data:(image/[a-zA-Z0-9\-\.]+);base64,', image_base64)
+        if not mime_match:
+            logger.error("MIME 타입 추출 실패")
+            return None
+        
+        mime_type = mime_match.group(1)
+        base64_data = image_base64.split(',')[1]
+        
+        # 파일 확장자 결정
+        mime_to_ext = {
+            'image/jpeg': 'jpg',
+            'image/jpg': 'jpg',
+            'image/png': 'png',
+            'image/gif': 'gif',
+            'image/webp': 'webp'
+        }
+        file_ext = mime_to_ext.get(mime_type, 'jpg')
+        
+        # Base64 디코딩
+        try:
+            image_data = base64.b64decode(base64_data, validate=True)
+        except Exception as e:
+            logger.error(f"Base64 디코딩 실패: {str(e)}")
+            return None
+        
+        # 파일 크기 검증 (5MB)
+        MAX_FILE_SIZE = 5 * 1024 * 1024
+        if len(image_data) > MAX_FILE_SIZE:
+            logger.error(f"파일 크기 초과: {len(image_data)} bytes")
+            return None
+        
+        # 파일 경로 생성
+        timestamp = int(datetime.now().timestamp() * 1000)
+        random_str = os.urandom(8).hex()
+        path = f"reviews/{user_id}/{timestamp}_{random_str}.{file_ext}"
+        
+        # Supabase Storage에 업로드
+        logger.info(f"이미지 업로드 시작: User ID={user_id}, Path={path}")
+        
+        try:
+            # Supabase Python 클라이언트의 Storage API 사용
+            upload_result = supabase.storage.from_('review_images').upload(
+                path=path,
+                file=image_data,
+                file_options={
+                    "content-type": mime_type,
+                    "cache-control": "3600"
+                }
+            )
+            
+            # 업로드 응답 확인
+            if hasattr(upload_result, 'error') and upload_result.error:
+                logger.error(f"이미지 업로드 실패: {upload_result.error}")
+                return None
+            
+            logger.info(f"이미지 업로드 성공: {path}")
+            
+            # Public URL 가져오기
+            url_result = supabase.storage.from_('review_images').get_public_url(path)
+            
+            if url_result:
+                public_url = url_result
+                logger.info(f"이미지 Public URL: {public_url}")
+                return public_url
+            else:
+                logger.error("Public URL 가져오기 실패")
+                return None
+                
+        except Exception as storage_error:
+            logger.error(f"Storage 업로드 중 오류: {type(storage_error).__name__}: {str(storage_error)}", exc_info=True)
+            return None
+            
+    except Exception as e:
+        logger.error(f"이미지 업로드 중 오류 발생: {type(e).__name__}", exc_info=True)
+        return None
+
+
 def check_restaurant_exists(restaurant_id):
     """식당 존재 확인"""
     try:
@@ -512,7 +602,48 @@ def create_review(restaurant_id, user_id):
         title = sanitize_input(data.get('title'), max_length=100) if data.get('title') else None
         content = sanitize_input(data.get('content'), max_length=2000) if data.get('content') else None
         rating = data.get('rating')
-        image_url = sanitize_input(data.get('image'), max_length=2048) if data.get('image') else None
+        image_data = data.get('image')  # Base64 또는 URL
+        
+        # 이미지 처리: Base64인 경우 Storage에 업로드, URL인 경우 그대로 사용
+        image_url = None
+        if image_data:
+            if isinstance(image_data, str):
+                # Base64 이미지인 경우 Storage에 업로드
+                if image_data.startswith('data:image/'):
+                    logger.info(f"Base64 이미지 감지, Storage에 업로드 시작: User ID={user_id}")
+                    # Base64 검증
+                    is_valid, error_msg = validate_base64_image(image_data)
+                    if not is_valid:
+                        return jsonify({
+                            "success": False,
+                            "error": error_msg
+                        }), 400
+                    
+                    # Storage에 업로드
+                    image_url = upload_image_to_storage(image_data, user_id)
+                    if not image_url:
+                        logger.error("이미지 업로드 실패")
+                        return jsonify({
+                            "success": False,
+                            "error": "이미지 업로드에 실패했습니다. 다시 시도해주세요."
+                        }), 500
+                # URL인 경우 검증 후 사용
+                elif image_data.startswith(('http://', 'https://')):
+                    is_valid, error_msg = validate_image_url(image_data)
+                    if is_valid:
+                        image_url = image_data
+                    else:
+                        logger.warning(f"이미지 URL 검증 실패: {error_msg}")
+                        return jsonify({
+                            "success": False,
+                            "error": error_msg
+                        }), 400
+                else:
+                    logger.warning(f"잘못된 이미지 형식: {image_data[:50]}...")
+                    return jsonify({
+                        "success": False,
+                        "error": "올바른 이미지 형식이 아닙니다."
+                    }), 400
         
         # 필수 필드 검증
         if not title:
