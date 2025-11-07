@@ -3,6 +3,7 @@ import os
 from flask import Flask, jsonify  # pyright: ignore[reportMissingImports]
 from flask_cors import CORS  # pyright: ignore[reportMissingModuleSource]
 from dotenv import load_dotenv  # pyright: ignore[reportMissingImports]
+from flask_talisman import Talisman
 load_dotenv()
 import os
 import logging
@@ -20,7 +21,11 @@ from app.config import SECRET_KEY
 
 
 app = Flask(__name__)
-
+csp = {
+    'default-src': "'self'",
+    'script-src': ["'self'", os.getenv('FRONTEND_ORIGIN')]
+}
+Talisman(app, content_security_policy=csp)
 
 app.config['JSON_AS_ASCII'] = False
 app.config['JSONIFY_MIMETYPE'] = 'application/json; charset=utf-8'

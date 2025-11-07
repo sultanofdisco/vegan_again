@@ -2,4 +2,6 @@ Flask==3.0.0
 supabase==2.0.3
 python-dotenv==1.0.0
 bcrypt==4.1.2
+flask-talisman
+Talisman
 flask-cors

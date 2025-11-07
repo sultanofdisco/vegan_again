@@ -33,7 +33,6 @@ export function useGeolocation(autoRequest: boolean = false): UseGeolocationRetu
       setState(prev => ({ ...prev, permission: result.state as 'granted' | 'denied' | 'prompt' }));
       return result.state;
     } catch (err) {
-      console.error('[useGeolocation] Permission check failed:', err);
       return null;
     }
   }, []);
