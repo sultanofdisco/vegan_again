@@ -25,7 +25,7 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
           center?.lat || 37.5665, // 기본값
           center?.lng || 126.9780
         ),
-        level: 5,
+        level: 2,
       };
 
       // 지도 생성

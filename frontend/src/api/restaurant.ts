@@ -24,7 +24,7 @@ interface ApiRestaurant {
   available_levels?: string[];
   rating?: number;
   review_count?: number;
-  thumbnailurl?: string;
+  thumbnailUrl?: string;
   image_urls?: string[];
   created_at?: string;
   updated_at?: string;
@@ -81,6 +81,15 @@ const convertToVegetarianLevels = (levels?: string[]): VegetarianLevel[] => {
 };
 
 const convertApiRestaurantToRestaurant = (item: ApiRestaurant): Restaurant => {
+
+  // 이 부분 추가
+  console.log('API Restaurant Item:', {
+    id: item.restaurant_id,
+    name: item.name,
+    thumbnailurl: item.thumbnailUrl,
+    image_urls: item.image_urls
+  });
+  
   if (!item.restaurant_id || !item.name || !item.address) {
     throw new Error('필수 필드가 누락되었습니다.');
   }
@@ -107,7 +116,7 @@ const convertApiRestaurantToRestaurant = (item: ApiRestaurant): Restaurant => {
     availableLevels: convertToVegetarianLevels(item.available_levels),
     rating: typeof item.rating === 'number' ? item.rating : undefined,
     reviewCount: typeof item.review_count === 'number' ? item.review_count : 0,
-    thumbnailUrl: item.thumbnailurl || undefined,
+    thumbnailUrl: item.thumbnailUrl || undefined,
     imageUrls: Array.isArray(item.image_urls) ? item.image_urls : [],
     dataSource: item.data_source || undefined,
     createdAt: item.created_at || new Date().toISOString(),
