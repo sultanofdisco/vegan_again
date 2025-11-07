@@ -14,24 +14,34 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
   const mapRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
 
-  // 지도 초기화
+  // 지도 초기화 (한 번만)
   useEffect(() => {
-    if (!mapContainerRef.current) return;
+    if (!mapContainerRef.current || mapRef.current) return;
 
-    // 카카오맵 SDK 로드 대기
     window.kakao.maps.load(() => {
       const options = {
         center: new window.kakao.maps.LatLng(
-          center?.lat || 37.5665, // 기본값
+          center?.lat || 37.5665,
           center?.lng || 126.9780
         ),
-        level: 2,
+        level: 5,
       };
 
-      // 지도 생성
       const map = new window.kakao.maps.Map(mapContainerRef.current, options);
       mapRef.current = map;
+      console.log('🗺️ Map initialized with center:', center);
     });
+  }, []);
+
+  // center가 변경되면 지도 중심 이동
+  useEffect(() => {
+    console.log('🎯 Map center changed:', center);
+    if (!mapRef.current || !center) return;
+
+    const moveLatLng = new window.kakao.maps.LatLng(center.lat, center.lng);
+    mapRef.current.setCenter(moveLatLng);
+    mapRef.current.setLevel(3);
+    console.log('✅ Map moved to:', center);
   }, [center]);
 
   // 마커 표시
@@ -56,7 +66,6 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
 
       marker.setMap(mapRef.current);
 
-      // 마커 클릭 이벤트
       if (onMarkerClick) {
         window.kakao.maps.event.addListener(marker, 'click', () => {
           onMarkerClick(restaurant);
@@ -67,19 +76,6 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
     });
 
     markersRef.current = newMarkers;
-
-    if (newMarkers.length > 0) {
-      const bounds = new window.kakao.maps.LatLngBounds();
-      restaurants.forEach(restaurant => {
-        bounds.extend(
-          new window.kakao.maps.LatLng(
-            restaurant.location.lat,
-            restaurant.location.lng
-          )
-        );
-      });
-      mapRef.current.setBounds(bounds);
-    }
   }, [restaurants, onMarkerClick]);
 
   return <div ref={mapContainerRef} className={styles.mapContainer} />;

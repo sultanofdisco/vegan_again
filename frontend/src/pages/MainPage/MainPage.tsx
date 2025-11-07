@@ -25,6 +25,11 @@ function MainPage() {
     requestLocation 
   } = useGeolocation();
 
+  // 디버깅: 위치 정보 변경 추적
+  useEffect(() => {
+    console.log('📍 Current location:', { latitude, longitude, permission });
+  }, [latitude, longitude, permission]);
+
   // 페이지 첫 로드 시 한 번만 모달 표시
   useEffect(() => {
     const hasShownModal = sessionStorage.getItem('locationModalShown');
@@ -53,11 +58,13 @@ function MainPage() {
   };
 
   const handleAllowLocation = () => {
+    console.log('✅ Allow clicked - requesting location');
     setShowLocationModal(false);
     requestLocation();
   };
 
   const handleDenyLocation = () => {
+    console.log('❌ Deny clicked - using default location');
     setShowLocationModal(false);
   };
 
@@ -99,6 +106,8 @@ function MainPage() {
   const mapCenter = latitude && longitude
     ? { lat: latitude, lng: longitude }
     : { lat: 37.5665, lng: 126.9780 };
+
+  console.log('🗺️ Map center calculated:', mapCenter);
 
   return (
     <div className={styles.mainPage}>
