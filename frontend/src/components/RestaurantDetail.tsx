@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
 import MenuList from './MenuList';
@@ -11,7 +10,6 @@ import { useRestaurantMenus } from '../hooks/useRestaurantMenus';
 import { useRestaurantReviews } from '../hooks/useRestaurantReviews';
 import { useRestaurantBookmark } from '../hooks/useRestaurantBookmark';
 import { useImageUpload } from '../hooks/useImageUpload';
-import { imageToBase64 } from '../utils/imageToBase64';
 
 interface RestaurantDetailProps {
   restaurant: Restaurant;
@@ -39,37 +37,43 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
   };
 
   const handleSubmitReview = async (content: string, image: File | null, rating: number) => {
-  if (!user) {
-    alert('로그인이 필요합니다.');
-    return;
-  }
-
-  try {
-    let imageBase64: string | null = null;
-    if (image) {
-      imageBase64 = await imageToBase64(image);
+    if (!user) {
+      alert('로그인이 필요합니다.');
+      return;
     }
 
-    const apiClient = (await import('../lib/axios')).default;
+    try {
+      let imageUrl: string | null = null;
 
-    const response = await apiClient.post(`/restaurants/${restaurant.id}/reviews`, {
-      title: content.substring(0, 100),
-      content,
-      rating,
-      image: imageBase64, // Base64로 직접 전달
-    });
+      if (image) {
+        imageUrl = await uploadImage(image, user.user_id);
+        if (!imageUrl) {
+          alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
+          return;
+        }
+      }
 
-    if (response.data.success) {
-      await refetchReviews();
-      alert('리뷰가 등록되었습니다.');
-    } else {
-      throw new Error(response.data.error || '리뷰 등록 실패');
+      // 백엔드 API를 통해 리뷰 작성
+      const apiClient = (await import('../lib/axios')).default;
+      const response = await apiClient.post(`/restaurants/${restaurant.id}/reviews`, {
+        title: content.substring(0, 100),
+        content: content,
+        rating: rating,
+        image_url: imageUrl,
+      });
+
+      if (response.data.success) {
+        await refetchReviews();
+        alert('리뷰가 등록되었습니다.');
+      } else {
+        throw new Error(response.data.error || '리뷰 등록 실패');
+      }
+    } catch (error: any) {
+      console.error('[Submit Review Error]:', error);
+      const errorMessage = error.response?.data?.error || error.message || '리뷰 등록 중 오류가 발생했습니다.';
+      alert(errorMessage);
     }
-  } catch (error: any) {
-    console.error('[Submit Review Error]:', error);
-    alert(error.response?.data?.error || error.message || '리뷰 등록 중 오류가 발생했습니다.');
-  }
-};
+  };
 
   return (
     <div className={styles.overlay} onClick={onClose}>

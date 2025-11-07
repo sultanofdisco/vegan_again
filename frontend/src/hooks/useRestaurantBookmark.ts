@@ -25,12 +25,13 @@ export function useRestaurantBookmark(
     }
 
     try {
+      // /bookmarks → /users/bookmarks 로 변경
       const response = await apiClient.get('/users/bookmarks');
       if (response.data.success && response.data.data) {
         const bookmark = response.data.data.find(
           (item: any) => {
-            const restaurantIdFromItem = 
-              item.restaurant_id || 
+            const restaurantIdFromItem =
+              item.restaurant_id ||
               (item.restaurants && item.restaurants.id) ||
               (item.restaurant && item.restaurant.id);
             return restaurantIdFromItem === restaurantId;
@@ -57,8 +58,8 @@ export function useRestaurantBookmark(
 
   const addBookmark = async () => {
     try {
+      // /bookmarks/${restaurantId} → /users/bookmarks/${restaurantId} 로 변경
       const response = await apiClient.post(`/users/bookmarks/${restaurantId}`);
-
       if (response.data.success) {
         setIsBookmarked(true);
         await checkBookmarkStatus();
@@ -68,7 +69,6 @@ export function useRestaurantBookmark(
       }
     } catch (error: any) {
       console.error('[useRestaurantBookmark] Add Failed:', error);
-      
       if (error.response?.status === 409 || error.response?.status === 400) {
         alert('이미 즐겨찾기한 식당입니다.');
         await checkBookmarkStatus();
@@ -80,8 +80,8 @@ export function useRestaurantBookmark(
 
   const removeBookmark = async () => {
     try {
+      // /bookmarks/${restaurantId} → /users/bookmarks/${restaurantId} 로 변경
       const response = await apiClient.delete(`/users/bookmarks/${restaurantId}`);
-
       if (response.data.success) {
         setIsBookmarked(false);
         setBookmarkId(null);
@@ -97,7 +97,6 @@ export function useRestaurantBookmark(
 
   const toggleBookmark = async () => {
     if (loading) return;
-    
     setLoading(true);
     try {
       if (isBookmarked) {

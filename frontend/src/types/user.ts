@@ -58,3 +58,5 @@ export interface UpdateProfileDB {
   profile_image_url?: string;
   updated_at?: string;                
 }
+
+export type User = UserProfile;
