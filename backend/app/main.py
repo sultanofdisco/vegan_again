@@ -8,6 +8,7 @@ import os
 import logging
 from datetime import timedelta
 from flask_wtf.csrf import CSRFProtect
+from flask_talisman import Talisman
 
 logging.basicConfig(
     filename='app.log',
@@ -21,6 +22,7 @@ from app.config import SECRET_KEY
 
 csrf = CSRFProtect()
 app = Flask(__name__)
+Talisman(app)
 
 app.config['JSON_AS_ASCII'] = False
 app.config['JSONIFY_MIMETYPE'] = 'application/json; charset=utf-8'
