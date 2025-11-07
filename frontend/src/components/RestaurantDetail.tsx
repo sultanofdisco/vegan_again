@@ -5,7 +5,7 @@ import ReviewList from './ReviewList';
 import LoadingState from './LoadingState';
 import styles from './RestaurantDetail.module.css';
 import type { Restaurant } from '../types/restaurant';
-import { useUserStore } from '../stores/useUserStore';
+import { usebackUserStore } from '../stores/useUserStore';
 import { useRestaurantMenus } from '../hooks/useRestaurantMenus';
 import { useRestaurantReviews } from '../hooks/useRestaurantReviews';
 import { useRestaurantBookmark } from '../hooks/useRestaurantBookmark';
@@ -18,7 +18,7 @@ interface RestaurantDetailProps {
 type TabType = 'menu' | 'review';
 
 function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
-  const user = useUserStore((state) => state.user);
+  const user = usebackUserStore((state) => state.user);
   const [activeTab, setActiveTab] = useState<TabType>('menu');
 
   // Custom Hooks
