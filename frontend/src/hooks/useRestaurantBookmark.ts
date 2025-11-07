@@ -14,7 +14,7 @@ export function useRestaurantBookmark(
   user: User | null
 ): UseRestaurantBookmarkReturn {
   const [isBookmarked, setIsBookmarked] = useState(false);
-  const [bookmarkId, setBookmarkId] = useState<number | null>(null);
+  const [_bookmarkId, setBookmarkId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
   const checkBookmarkStatus = useCallback(async () => {
