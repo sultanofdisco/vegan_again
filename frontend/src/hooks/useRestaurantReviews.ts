@@ -29,8 +29,9 @@ export function useRestaurantReviews(restaurantId: number | string): UseRestaura
 
       const res = await apiClient.get(`/restaurants/${parsedId}/reviews`);
 
-      if (res.data.success && Array.isArray(res.data.data)) {
-        setReviews(res.data.data);
+      // 수정: res.data.data.reviews를 확인
+      if (res.data.success && res.data.data?.reviews && Array.isArray(res.data.data.reviews)) {
+        setReviews(res.data.data.reviews);
       } else {
         setReviews([]);
       }

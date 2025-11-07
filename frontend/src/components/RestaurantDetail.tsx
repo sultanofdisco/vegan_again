@@ -63,7 +63,10 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
       });
 
       if (response.data.success) {
+        console.log('✅ 리뷰 등록 성공!');
+        console.log('refetch 전 리뷰 개수:', reviews.length);
         await refetchReviews();
+        console.log('refetch 후 리뷰 개수:', reviews.length);
         alert('리뷰가 등록되었습니다.');
       } else {
         throw new Error(response.data.error || '리뷰 등록 실패');
