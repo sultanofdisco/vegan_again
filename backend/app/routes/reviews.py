@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from app.config import supabase
 from app.auth.session import validate_session_security
-from app.auth.validators import sanitize_input, validate_base64_image, validate_image_url, validate_review_title, validate_review_content
+from app.auth.validators import sanitize_input, validate_base64_image, validate_review_content, validate_uploaded_file
 from functools import wraps
 from datetime import datetime
 import logging
@@ -113,12 +113,7 @@ def upload_image_to_storage(image_base64: str, user_id: int) -> str | None:
         except Exception as e:
             logger.error(f"Base64 디코딩 실패: {str(e)}")
             return None
-        
-        # 파일 크기 검증 (5MB)
-        MAX_FILE_SIZE = 5 * 1024 * 1024
-        if len(image_data) > MAX_FILE_SIZE:
-            logger.error(f"파일 크기 초과: {len(image_data)} bytes")
-            return None
+        # 파일 크기는 supabase 스토리지 설정에서 5MB로 제한
         
         # 파일 경로 생성
         timestamp = int(datetime.now().timestamp() * 1000)
@@ -174,7 +169,6 @@ def check_restaurant_exists(restaurant_id):
         logger.error(f"식당 존재 확인 오류: {str(e)}", exc_info=True)
         return False
 
-
 @reviews_bp.route('/users/reviews', methods=['GET'])
 @login_required
 def get_user_reviews(user_id):
@@ -201,14 +195,13 @@ def get_user_reviews(user_id):
             .range(offset, offset + limit - 1) \
             .execute()
         
-        # 전체 개수 조회 (페이지네이션용) - 더 간단한 방식
+        # 전체 개수 조회 (페이지네이션용)
         try:
             count_result = supabase.table('reviews') \
                 .select('review_id', count='exact') \
                 .eq('user_id', user_id) \
                 .execute()
             
-            # Supabase count 응답 처리
             if hasattr(count_result, 'count') and count_result.count is not None:
                 total_count = count_result.count
             else:
@@ -222,9 +215,7 @@ def get_user_reviews(user_id):
         restaurant_ids = []
         if result.data:
             restaurant_ids = [item.get('restaurant_id') for item in result.data if item.get('restaurant_id')]
-            restaurant_ids = list(set(restaurant_ids))  # 중복 제거
-        
-        # 식당 정보 일괄 조회
+            restaurant_ids = list(set(restaurant_ids))  # 중복 제거\
         restaurants_map = {}
         if restaurant_ids:
             try:
@@ -432,8 +423,6 @@ def get_restaurant_reviews(restaurant_id):
         }), 500
 
 
-
-
 @reviews_bp.route('/restaurants/<restaurant_id>/reviews', methods=['POST'])
 @login_required
 def create_review(restaurant_id, user_id):
@@ -464,18 +453,15 @@ def create_review(restaurant_id, user_id):
             }), 400
         
         # 입력 값 추출 및 sanitization
-        title = sanitize_input(data.get('title'), max_length=100) if data.get('title') else None
         content = sanitize_input(data.get('content'), max_length=2000) if data.get('content') else None
         rating = data.get('rating')
-        image_data = data.get('image')  # Base64 또는 URL
+        image_data = data.get('image')  # Base64
         
-        # 이미지 처리: Base64인 경우 Storage에 업로드, URL인 경우 그대로 사용
+        # 이미지 처리: Base64인 경우 Storage에 업로드
         image_url = None
         if image_data:
             if isinstance(image_data, str):
-                # Base64 이미지인 경우 Storage에 업로드
                 if image_data.startswith('data:image/'):
-                    # Base64 검증
                     is_valid, error_msg = validate_base64_image(image_data)
                     if not is_valid:
                         return jsonify({
@@ -491,30 +477,12 @@ def create_review(restaurant_id, user_id):
                             "success": False,
                             "error": "이미지 업로드에 실패했습니다. 다시 시도해주세요."
                         }), 500
-                # URL인 경우 검증 후 사용
-                elif image_data.startswith(('http://', 'https://')):
-                    is_valid, error_msg = validate_image_url(image_data)
-                    if is_valid:
-                        image_url = image_data
-                    else:
-                        logger.warning(f"이미지 URL 검증 실패: {error_msg}")
-                        return jsonify({
-                            "success": False,
-                            "error": error_msg
-                        }), 400
                 else:
                     logger.warning(f"잘못된 이미지 형식: {image_data[:50]}...")
                     return jsonify({
                         "success": False,
                         "error": "올바른 이미지 형식이 아닙니다."
                     }), 400
-        
-        # 필수 필드 검증
-        if not title:
-            return jsonify({
-                "success": False,
-                "error": "제목은 필수 항목입니다."
-            }), 400
         
         if not content:
             return jsonify({
@@ -528,12 +496,10 @@ def create_review(restaurant_id, user_id):
                 "error": "평점은 필수 항목입니다."
             }), 400
         
-        # 입력 검증
-        is_valid, error_msg = validate_review_title(title)
-        if not is_valid:
+        if not isinstance(rating, int) or rating < 1 or rating > 5:
             return jsonify({
                 "success": False,
-                "error": error_msg
+                "error": "평점은 1에서 5 사이의 정수여야 합니다."
             }), 400
         
         is_valid, error_msg = validate_review_content(content)
@@ -542,14 +508,6 @@ def create_review(restaurant_id, user_id):
                 "success": False,
                 "error": error_msg
             }), 400
-        
-        if image_url:
-            is_valid, error_msg = validate_image_url(image_url)
-            if not is_valid:
-                return jsonify({
-                    "success": False,
-                    "error": error_msg
-                }), 400
         
         # 현재 시간
         now = datetime.now().isoformat()
@@ -564,15 +522,9 @@ def create_review(restaurant_id, user_id):
             'updated_at': now
         }
         
-        # 제목이 DB에 있는 경우 (없으면 content를 title로 사용)
-        # DB 스키마에 title 필드가 있다면 추가
-        # review_data['title'] = title
-        
-        # 이미지 URL 추가 (있는 경우)
         if image_url:
             review_data['image_url'] = image_url
         
-        # 리뷰 삽입
         result = supabase.table('reviews').insert(review_data).execute()
         
         if not result.data:
@@ -589,7 +541,6 @@ def create_review(restaurant_id, user_id):
             "reviewId": review.get('review_id'),
             "storeId": review.get('restaurant_id'),
             "userId": review.get('user_id'),
-            "title": title,  # 요청에서 받은 title
             "content": review.get('content'),
             "image": review.get('image_url') or '',
             "rating": review.get('rating'),
@@ -603,12 +554,6 @@ def create_review(restaurant_id, user_id):
             "data": response_data
         }), 201
     
-    except ValueError as e:
-        logger.warning(f"리뷰 작성 요청 오류: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": "요청 데이터 형식이 올바르지 않습니다."
-        }), 400
     except Exception as e:
         logger.error(f"리뷰 작성 중 오류 발생: {type(e).__name__}", exc_info=True)
         return jsonify({
@@ -673,19 +618,6 @@ def update_review(review_id, user_id):
         # 업데이트할 필드 추출
         update_fields = {}
         
-        # 제목 검증 및 추가
-        if 'title' in data:
-            title = sanitize_input(data.get('title'), max_length=100) if data.get('title') else None
-            if title is not None:
-                is_valid, error_msg = validate_review_title(title)
-                if not is_valid:
-                    return jsonify({
-                        "success": False,
-                        "error": error_msg
-                    }), 400
-                # DB에 title 필드가 있다면 추가
-                # update_fields['title'] = title
-        
         # 내용 검증 및 추가
         if 'content' in data:
             content = sanitize_input(data.get('content'), max_length=2000) if data.get('content') else None
@@ -708,18 +640,33 @@ def update_review(review_id, user_id):
                         "error": "평점은 1에서 5 사이의 정수여야 합니다."
                     }), 400
                 update_fields['rating'] = int(rating)
-        
-        # 이미지 URL 검증 및 추가
-        if 'image' in data:
-            image_url = sanitize_input(data.get('image'), max_length=2048) if data.get('image') else None
-            if image_url is not None:
-                is_valid, error_msg = validate_image_url(image_url)
-                if not is_valid:
+
+        image_url = None
+        if 'image_data' in data:
+            image_data = data.get('image_data')  # Base64
+            if isinstance(image_data, str):
+                if image_data.startswith('data:image/'):
+                    is_valid, error_msg = validate_base64_image(image_data)
+                    if not is_valid:
+                        return jsonify({
+                            "success": False,
+                            "error": error_msg
+                        }), 400
+                    
+                    image_url = upload_image_to_storage(image_data, user_id)
+                    if not image_url:
+                        logger.error("이미지 업로드 실패")
+                        return jsonify({
+                            "success": False,
+                            "error": "이미지 업로드에 실패했습니다. 다시 시도해주세요."
+                        }), 500
+                else:
+                    logger.warning(f"잘못된 이미지 형식: {image_data[:50]}...")
                     return jsonify({
                         "success": False,
-                        "error": error_msg
+                        "error": "올바른 이미지 형식이 아닙니다."
                     }), 400
-                update_fields['image_url'] = image_url if image_url else None
+            update_fields['image_url'] = image_url
         
         # 업데이트할 필드가 없으면 에러
         if not update_fields:
@@ -752,7 +699,6 @@ def update_review(review_id, user_id):
             "reviewId": updated_review.get('review_id'),
             "storeId": updated_review.get('restaurant_id'),
             "userId": updated_review.get('user_id'),
-            "title": data.get('title', ''),  # 요청에서 받은 title 또는 빈 문자열
             "content": updated_review.get('content'),
             "image": updated_review.get('image_url') or '',
             "rating": updated_review.get('rating'),
@@ -760,19 +706,11 @@ def update_review(review_id, user_id):
             "updatedAt": updated_review.get('updated_at')
         }
         
-        
         return jsonify({
             "success": True,
             "message": "리뷰가 수정되었습니다.",
             "data": response_data
         }), 200
-    
-    except ValueError as e:
-        logger.warning(f"리뷰 수정 요청 오류: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": "요청 데이터 형식이 올바르지 않습니다."
-        }), 400
     except Exception as e:
         logger.error(f"리뷰 수정 중 오류 발생: {type(e).__name__}", exc_info=True)
         return jsonify({

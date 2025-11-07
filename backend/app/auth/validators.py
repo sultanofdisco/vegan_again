@@ -1,6 +1,9 @@
+import base64
 import html
 import re
 from app.config import supabase
+from werkzeug.utils import secure_filename
+import os
 
 
 def validate_string_type(value, field_name):
@@ -181,29 +184,6 @@ def check_email_exists(email):
         # 에러 발생 시 False 반환 (존재하지 않는 것으로 처리)
         return False
 
-def validate_review_title(title):
-    """리뷰 제목 검증"""
-    if not title:
-        return False, '제목은 필수 항목입니다.'
-    
-    if not isinstance(title, str):
-        return False, '제목은 문자열이어야 합니다.'
-    
-    title = title.strip()
-    if len(title) < 1:
-        return False, '제목은 필수 항목입니다.'
-    
-    if len(title) > 100:
-        return False, '제목은 최대 100자까지 입력 가능합니다.'
-    
-    # XSS 방지: 위험한 문자 검증
-    dangerous_chars = ['<', '>', '"', "'", '&']
-    for char in dangerous_chars:
-        if char in title:
-            return False, '제목에 사용할 수 없는 문자가 포함되어 있습니다.'
-    
-    return True, None
-
 
 def validate_review_content(content):
     """리뷰 내용 검증"""
@@ -222,8 +202,6 @@ def validate_review_content(content):
     
     return True, None
 
-
-def validate_image_url(image_url):
     """이미지 URL 검증"""
     if image_url is None or image_url == '':
         return True, None  # 선택사항
@@ -304,3 +282,63 @@ def validate_base64_image(base64_string):
             return False, "WEBP 이미지의 매직 넘버가 올바르지 않습니다."
 
     return True, None
+
+def validate_uploaded_file(file):
+    """업로드된 파일 검증 (multipart/form-data 파일 업로드용)"""
+    if not file:
+        return True, None  # 선택사항
+    
+    # 파일 이름 검증 (경로 탐색 공격 방지)
+    filename = secure_filename(file.filename) if hasattr(file, 'filename') else None
+    if not filename:
+        return False, "파일 이름이 올바르지 않습니다."
+    
+    # 파일 이름 길이 제한
+    if len(filename) > 255:
+        return False, "파일 이름이 너무 깁니다."
+    
+    # 위험한 파일 확장자 차단
+    dangerous_extensions = ['.exe', '.bat', '.cmd', '.com', '.pif', '.scr', '.vbs', '.js', '.jar', '.sh', '.php', '.asp', '.aspx', '.jsp']
+    file_ext = os.path.splitext(filename)[1].lower()
+    if file_ext in dangerous_extensions:
+        return False, f"허용되지 않는 파일 형식입니다: {file_ext}"
+    
+    # 허용된 이미지 확장자만 허용
+    allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
+    if file_ext not in allowed_extensions:
+        return False, f"지원하지 않는 이미지 형식입니다. JPEG, PNG, GIF, WEBP만 허용됩니다."
+    
+    # 파일 크기 제한 (5MB)
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+    if hasattr(file, 'content_length') and file.content_length:
+        if file.content_length > MAX_FILE_SIZE:
+            return False, "파일 크기는 5MB를 초과할 수 없습니다."
+    
+    # MIME 타입 검증
+    if hasattr(file, 'content_type') and file.content_type:
+        allowed_mime_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+        if file.content_type not in allowed_mime_types:
+            return False, f"지원하지 않는 이미지 형식입니다: {file.content_type}"
+    
+    try:
+        file.seek(0)
+        file_header = file.read(12)
+        file.seek(0)
+        
+        if file_ext in ['.jpg', '.jpeg']:
+            if not file_header.startswith(b'\xff\xd8\xff'):
+                return False, "JPEG 이미지의 매직 넘버가 올바르지 않습니다."
+        elif file_ext == '.png':
+            if not file_header.startswith(b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0a'):
+                return False, "PNG 이미지의 매직 넘버가 올바르지 않습니다."
+        elif file_ext == '.gif':
+            if not (file_header.startswith(b'GIF87a') or file_header.startswith(b'GIF89a')):
+                return False, "GIF 이미지의 매직 넘버가 올바르지 않습니다."
+        elif file_ext == '.webp':
+            if not (file_header.startswith(b'RIFF') and b'WEBP' in file_header):
+                return False, "WEBP 이미지의 매직 넘버가 올바르지 않습니다."
+    except Exception as e:
+        return False, "파일을 읽을 수 없습니다."
+    
+    return True, None
+
