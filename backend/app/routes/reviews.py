@@ -1,7 +1,7 @@
 import ipaddress
 import socket
 from urllib.parse import urlparse
-from click import Tuple
+from typing import Tuple
 import requests
 from flask import Blueprint, request, jsonify, session
 from app.config import supabase
