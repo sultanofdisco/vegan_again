@@ -42,7 +42,6 @@ export function useUserProfile(userId: string | null): UseUserProfileReturn {
         throw new Error('프로필을 불러올 수 없습니다.');
       }
     } catch (err) {
-      console.error('[useUserProfile] Fetch Failed:', err);
       setError('프로필을 불러오는데 실패했습니다.');
       setProfile(null);
     } finally {
@@ -82,7 +81,6 @@ export function useUserProfile(userId: string | null): UseUserProfileReturn {
       
       return false;
     } catch (err) {
-      console.error('[useUserProfile] Update Failed:', err);
       return false;
     }
   };

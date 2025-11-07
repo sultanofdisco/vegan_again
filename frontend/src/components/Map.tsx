@@ -30,7 +30,7 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
 
       const map = new window.kakao.maps.Map(mapContainerRef.current, options);
       mapRef.current = map;
-      console.log('🗺️ Map initialized with center:', center);
+  
       
       // 초기화 시 center가 있으면 설정 완료로 표시
       if (center) {
@@ -54,7 +54,7 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
 
       const map = new window.kakao.maps.Map(mapContainerRef.current, options);
       mapRef.current = map;
-      console.log('🗺️ Map initialized with center:', center);
+    
       
       // 초기화 시 center가 있으면 설정 완료로 표시
       if (center) {
@@ -65,14 +65,12 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
 
   // center가 변경되면 최초 1회만 지도 중심 이동
   useEffect(() => {
-    console.log('🎯 Map center changed:', center);
     if (!mapRef.current || !center || initialCenterSet.current) return;
 
     const moveLatLng = new window.kakao.maps.LatLng(center.lat, center.lng);
     mapRef.current.setCenter(moveLatLng);
     mapRef.current.setLevel(2); // 3 → 2로 변경 (더 확대)
     initialCenterSet.current = true; // 최초 1회 이동 완료
-    console.log('✅ Map moved to user location:', center);
   }, [center]);
 
   // 마커 표시 + 마커 영역에 맞게 자동 조정
@@ -119,7 +117,6 @@ function Map({ restaurants, center, onMarkerClick }: MapProps) {
       );
     });
     mapRef.current.setBounds(bounds);
-    console.log('📍 Map adjusted to show all markers');
   }, [restaurants, onMarkerClick]);
 
   return <div ref={mapContainerRef} className={styles.mapContainer} />;

@@ -29,12 +29,10 @@ export function useImageUpload(): UseImageUploadReturn {
     }
 
     try {
-      console.log('📤 이미지 Base64 변환 시작');
       
       // base64로 변환
       const base64Image = await imageToBase64(file);
       
-      console.log('✅ Base64 변환 완료, 백엔드로 전송 시작');
 
       // 백엔드에 base64 이미지 전송
       const apiClient = (await import('../lib/axios')).default;
@@ -43,20 +41,17 @@ export function useImageUpload(): UseImageUploadReturn {
         userId,
       });
 
-      console.log('✅ 백엔드 응답:', response.data);
 
       // 백엔드에서 반환한 이미지 URL 추출
       const imageUrl = response.data.imageUrl || response.data.data?.imageUrl || response.data.url;
       
       if (!imageUrl) {
-        console.error('❌ 응답에서 imageUrl을 찾을 수 없음:', response.data);
         throw new Error('이미지 URL을 받지 못했습니다.');
       }
 
       return imageUrl;
 
     } catch (error) {
-      console.error('[useImageUpload] Upload Error:', error);
       alert('이미지 업로드 중 오류가 발생했습니다.');
       return null;
     }

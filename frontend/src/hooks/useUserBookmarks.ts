@@ -42,7 +42,6 @@ export function useUserBookmarks(userId: string | null): UseUserBookmarksReturn 
       
       return [];
     } catch (err) {
-      console.error('[useUserBookmarks] Fetch Failed:', err);
       return [];
     }
   }, [userId]);
@@ -97,7 +96,6 @@ export function useUserBookmarks(userId: string | null): UseUserBookmarksReturn 
       
       throw new Error(response.data.error || '북마크 삭제 실패');
     } catch (err: any) {
-      console.error('[useUserBookmarks] Remove Failed:', err);
       const errorMessage = err.response?.data?.error || err.message || '즐겨찾기 해제에 실패했습니다.';
       alert(errorMessage);
       return false;

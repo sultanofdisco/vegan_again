@@ -50,7 +50,6 @@ export function useRestaurantBookmark(
         setBookmarkId(null);
       }
     } catch (error) {
-      console.error('[useRestaurantBookmark] Check Failed:', error);
       setIsBookmarked(false);
       setBookmarkId(null);
     }
@@ -68,7 +67,6 @@ export function useRestaurantBookmark(
         throw new Error(response.data.error || '북마크 추가 실패');
       }
     } catch (error: any) {
-      console.error('[useRestaurantBookmark] Add Failed:', error);
       if (error.response?.status === 409 || error.response?.status === 400) {
         alert('이미 즐겨찾기한 식당입니다.');
         await checkBookmarkStatus();
@@ -90,7 +88,6 @@ export function useRestaurantBookmark(
         throw new Error(response.data.error || '북마크 삭제 실패');
       }
     } catch (error) {
-      console.error('[useRestaurantBookmark] Remove Failed:', error);
       alert('찜 해제에 실패했습니다. 다시 시도해주세요.');
     }
   };
