@@ -7,8 +7,6 @@ load_dotenv()
 import os
 import logging
 from datetime import timedelta
-from flask_wtf.csrf import CSRFProtect
-from flask_talisman import Talisman
 
 logging.basicConfig(
     filename='app.log',
@@ -20,9 +18,9 @@ logging.basicConfig(
 from app.auth import auth_bp
 from app.config import SECRET_KEY
 
-csrf = CSRFProtect()
+
 app = Flask(__name__)
-Talisman(app)
+
 
 app.config['JSON_AS_ASCII'] = False
 app.config['JSONIFY_MIMETYPE'] = 'application/json; charset=utf-8'
@@ -35,7 +33,6 @@ CORS(app, resources={r"/api/*": {"origins": FRONTEND_ORIGIN}}, supports_credenti
 
 # 세션을 위한 secret key 설정
 app.config['SECRET_KEY'] = SECRET_KEY
-csrf.init_app(app)
 
 # 세션 보안 설정
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)  # 24시간 후 만료

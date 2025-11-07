@@ -9,7 +9,6 @@ import { useUserStore } from '../stores/useUserStore';
 import { useRestaurantMenus } from '../hooks/useRestaurantMenus';
 import { useRestaurantReviews } from '../hooks/useRestaurantReviews';
 import { useRestaurantBookmark } from '../hooks/useRestaurantBookmark';
-import { useImageUpload } from '../hooks/useImageUpload';
 
 interface RestaurantDetailProps {
   restaurant: Restaurant;
@@ -26,7 +25,6 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
   const { menus, loading: menusLoading } = useRestaurantMenus(restaurant.id);
   const { reviews, loading: reviewsLoading, refetch: refetchReviews } = useRestaurantReviews(restaurant.id);
   const { isBookmarked, loading: bookmarkLoading, toggleBookmark } = useRestaurantBookmark(restaurant.id, user);
-  const { uploadImage } = useImageUpload();
 
   const handleBookmarkClick = async () => {
     if (!user) {
@@ -43,30 +41,32 @@ function RestaurantDetail({ restaurant, onClose }: RestaurantDetailProps) {
     }
 
     try {
-      let imageUrl: string | null = null;
+      let base64Image: string | null = null;
 
+      // 이미지가 있으면 base64로 변환
       if (image) {
-        imageUrl = await uploadImage(image, user.user_id);
-        if (!imageUrl) {
-          alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
-          return;
-        }
+        console.log('📤 이미지 변환 시작:', image.name);
+        base64Image = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(image);
+        });
+        console.log('✅ Base64 변환 완료');
       }
 
-      // 백엔드 API를 통해 리뷰 작성
+      // 백엔드 API를 통해 리뷰 작성 (이미지 포함)
       const apiClient = (await import('../lib/axios')).default;
       const response = await apiClient.post(`/restaurants/${restaurant.id}/reviews`, {
         title: content.substring(0, 100),
         content: content,
         rating: rating,
-        image_url: imageUrl,
+        image: base64Image,
       });
 
       if (response.data.success) {
         console.log('✅ 리뷰 등록 성공!');
-        console.log('refetch 전 리뷰 개수:', reviews.length);
         await refetchReviews();
-        console.log('refetch 후 리뷰 개수:', reviews.length);
         alert('리뷰가 등록되었습니다.');
       } else {
         throw new Error(response.data.error || '리뷰 등록 실패');
