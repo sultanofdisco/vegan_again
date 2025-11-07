@@ -1,14 +1,13 @@
 from flask import Blueprint, request, jsonify, session
 from app.config import supabase
 from app.auth.session import validate_session_security
-from app.auth.validators import sanitize_input
+from app.auth.validators import sanitize_input, validate_base64_image, validate_image_url, validate_review_title, validate_review_content
 from functools import wraps
 from datetime import datetime
 import logging
 import re
 import base64
 import os
-from werkzeug.utils import secure_filename
 
 reviews_bp = Blueprint('reviews', __name__)
 logger = logging.getLogger(__name__)
@@ -42,7 +41,6 @@ def login_required(f):
         # 세션 토큰 확인
         session_token = session.get('session_token')
         if not session_token:
-            logger.warning(f'세션 토큰 없음: User ID={user_id}')
             return jsonify({
                 "success": False,
                 "error": "세션이 유효하지 않습니다. 다시 로그인해주세요."
@@ -52,209 +50,6 @@ def login_required(f):
         return f(*args, **kwargs)
     
     return decorated_function
-
-
-def validate_review_title(title):
-    """리뷰 제목 검증"""
-    if not title:
-        return False, '제목은 필수 항목입니다.'
-    
-    if not isinstance(title, str):
-        return False, '제목은 문자열이어야 합니다.'
-    
-    title = title.strip()
-    if len(title) < 1:
-        return False, '제목은 필수 항목입니다.'
-    
-    if len(title) > 100:
-        return False, '제목은 최대 100자까지 입력 가능합니다.'
-    
-    # XSS 방지: 위험한 문자 검증
-    dangerous_chars = ['<', '>', '"', "'", '&']
-    for char in dangerous_chars:
-        if char in title:
-            return False, '제목에 사용할 수 없는 문자가 포함되어 있습니다.'
-    
-    return True, None
-
-
-def validate_review_content(content):
-    """리뷰 내용 검증"""
-    if not content:
-        return False, '내용은 필수 항목입니다.'
-    
-    if not isinstance(content, str):
-        return False, '내용은 문자열이어야 합니다.'
-    
-    content = content.strip()
-    if len(content) < 1:
-        return False, '내용은 필수 항목입니다.'
-    
-    if len(content) > 2000:
-        return False, '내용은 최대 2000자까지 입력 가능합니다.'
-    
-    return True, None
-
-
-def validate_rating(rating):
-    """평점 검증"""
-    if rating is None:
-        return False, '평점은 필수 항목입니다.'
-    
-    if not isinstance(rating, (int, float)):
-        return False, '평점은 숫자여야 합니다.'
-    
-    rating_num = float(rating)
-    if rating_num < 1 or rating_num > 5:
-        return False, '평점은 1부터 5까지 입력 가능합니다.'
-    
-    return True, None
-
-
-def validate_image_url(image_url):
-    """이미지 URL 검증"""
-    if image_url is None or image_url == '':
-        return True, None  # 선택사항
-    
-    if not isinstance(image_url, str):
-        return False, '이미지 URL은 문자열이어야 합니다.'
-    
-    if len(image_url) > 2048:
-        return False, '이미지 URL은 최대 2048자까지 입력 가능합니다.'
-    
-    # Base64 이미지인지 확인
-    if image_url.startswith('data:image/'):
-        return validate_base64_image(image_url)
-    
-    # URL 형식 검증
-    url_pattern = r'^https?://[^\s/$.?#].[^\s]*$'
-    if not re.match(url_pattern, image_url):
-        return False, '올바른 URL 형식이 아닙니다.'
-    
-    # 안전한 프로토콜만 허용
-    if not image_url.startswith(('http://', 'https://')):
-        return False, '이미지 URL은 http 또는 https로 시작해야 합니다.'
-    
-    return True, None
-
-
-def validate_base64_image(base64_string):
-    """Base64 이미지 검증 (파일 업로드 취약점 방지)"""
-    if not base64_string:
-        return True, None  # 선택사항이므로 None은 허용
-    
-    if not isinstance(base64_string, str):
-        return False, "이미지 데이터는 문자열이어야 합니다."
-
-    # data URL 형식인지 확인 (예: data:image/png;base64,...)
-    if not base64_string.startswith('data:image/'):
-        return False, "올바른 Base64 이미지 데이터 형식이 아닙니다 (data URL 형식 필요)."
-
-    # MIME 타입 추출
-    mime_match = re.match(r'data:(image/[a-zA-Z0-9\-\.]+);base64,', base64_string)
-    if not mime_match:
-        return False, "올바른 Base64 이미지 데이터 형식이 아닙니다 (MIME 타입 오류)."
-    
-    mime_type = mime_match.group(1)
-    allowed_mime_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-    if mime_type not in allowed_mime_types:
-        return False, f"지원하지 않는 이미지 형식입니다: {mime_type}. JPEG, PNG, WEBP, GIF만 허용됩니다."
-
-    # Base64 부분 추출 및 디코딩 시도
-    try:
-        base64_only = base64_string.split(',')[1]
-        decoded_data = base64.b64decode(base64_only, validate=True)
-    except Exception:
-        return False, "유효하지 않은 Base64 인코딩입니다."
-
-    # 파일 크기 제한 (5MB)
-    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-    if len(decoded_data) > MAX_FILE_SIZE:
-        return False, "이미지 크기는 5MB를 초과할 수 없습니다."
-    
-    # 매직 넘버 검사 (실제 파일 타입 확인 - 파일 확장자 스푸핑 방지)
-    # JPEG: FF D8 FF
-    # PNG: 89 50 4E 47 0D 0A 1A 0A
-    # GIF: 47 49 46 38 37 61 or 47 49 46 38 39 61
-    # WEBP: 52 49 46 46 ?? ?? ?? ?? 57 45 42 50
-    
-    if mime_type == 'image/jpeg':
-        if not decoded_data.startswith(b'\xff\xd8\xff'):
-            return False, "JPEG 이미지의 매직 넘버가 올바르지 않습니다."
-    elif mime_type == 'image/png':
-        if not decoded_data.startswith(b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0a'):
-            return False, "PNG 이미지의 매직 넘버가 올바르지 않습니다."
-    elif mime_type == 'image/gif':
-        if not (decoded_data.startswith(b'GIF87a') or decoded_data.startswith(b'GIF89a')):
-            return False, "GIF 이미지의 매직 넘버가 올바르지 않습니다."
-    elif mime_type == 'image/webp':
-        if not (decoded_data.startswith(b'RIFF') and b'WEBP' in decoded_data[:12]):
-            return False, "WEBP 이미지의 매직 넘버가 올바르지 않습니다."
-
-    return True, None
-
-
-def validate_uploaded_file(file):
-    """업로드된 파일 검증 (multipart/form-data 파일 업로드용)"""
-    if not file:
-        return True, None  # 선택사항
-    
-    # 파일 이름 검증 (경로 탐색 공격 방지)
-    filename = secure_filename(file.filename) if hasattr(file, 'filename') else None
-    if not filename:
-        return False, "파일 이름이 올바르지 않습니다."
-    
-    # 파일 이름 길이 제한
-    if len(filename) > 255:
-        return False, "파일 이름이 너무 깁니다."
-    
-    # 위험한 파일 확장자 차단
-    dangerous_extensions = ['.exe', '.bat', '.cmd', '.com', '.pif', '.scr', '.vbs', '.js', '.jar', '.sh', '.php', '.asp', '.aspx', '.jsp']
-    file_ext = os.path.splitext(filename)[1].lower()
-    if file_ext in dangerous_extensions:
-        return False, f"허용되지 않는 파일 형식입니다: {file_ext}"
-    
-    # 허용된 이미지 확장자만 허용
-    allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
-    if file_ext not in allowed_extensions:
-        return False, f"지원하지 않는 이미지 형식입니다. JPEG, PNG, GIF, WEBP만 허용됩니다."
-    
-    # 파일 크기 제한 (5MB)
-    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
-    if hasattr(file, 'content_length') and file.content_length:
-        if file.content_length > MAX_FILE_SIZE:
-            return False, "파일 크기는 5MB를 초과할 수 없습니다."
-    
-    # MIME 타입 검증
-    if hasattr(file, 'content_type') and file.content_type:
-        allowed_mime_types = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-        if file.content_type not in allowed_mime_types:
-            return False, f"지원하지 않는 이미지 형식입니다: {file.content_type}"
-    
-    # 실제 파일 내용 읽기 (매직 넘버 검사)
-    try:
-        file.seek(0)  # 파일 포인터를 처음으로
-        file_header = file.read(12)  # 처음 12바이트 읽기
-        file.seek(0)  # 파일 포인터를 다시 처음으로
-        
-        # 매직 넘버 검사
-        if file_ext in ['.jpg', '.jpeg']:
-            if not file_header.startswith(b'\xff\xd8\xff'):
-                return False, "JPEG 이미지의 매직 넘버가 올바르지 않습니다."
-        elif file_ext == '.png':
-            if not file_header.startswith(b'\x89\x50\x4e\x47\x0d\x0a\x1a\x0a'):
-                return False, "PNG 이미지의 매직 넘버가 올바르지 않습니다."
-        elif file_ext == '.gif':
-            if not (file_header.startswith(b'GIF87a') or file_header.startswith(b'GIF89a')):
-                return False, "GIF 이미지의 매직 넘버가 올바르지 않습니다."
-        elif file_ext == '.webp':
-            if not (file_header.startswith(b'RIFF') and b'WEBP' in file_header):
-                return False, "WEBP 이미지의 매직 넘버가 올바르지 않습니다."
-    except Exception as e:
-        logger.error(f"파일 내용 검증 오류: {str(e)}", exc_info=True)
-        return False, "파일을 읽을 수 없습니다."
-    
-    return True, None
 
 
 def check_review_ownership(review_id, user_id):
@@ -329,9 +124,7 @@ def upload_image_to_storage(image_base64: str, user_id: int) -> str | None:
         timestamp = int(datetime.now().timestamp() * 1000)
         random_str = os.urandom(8).hex()
         path = f"reviews/{user_id}/{timestamp}_{random_str}.{file_ext}"
-        
-        # Supabase Storage에 업로드
-        logger.info(f"이미지 업로드 시작: User ID={user_id}, Path={path}")
+    
         
         try:
             # Supabase Python 클라이언트의 Storage API 사용
@@ -349,14 +142,11 @@ def upload_image_to_storage(image_base64: str, user_id: int) -> str | None:
                 logger.error(f"이미지 업로드 실패: {upload_result.error}")
                 return None
             
-            logger.info(f"이미지 업로드 성공: {path}")
-            
             # Public URL 가져오기
             url_result = supabase.storage.from_('review_images').get_public_url(path)
             
             if url_result:
                 public_url = url_result
-                logger.info(f"이미지 Public URL: {public_url}")
                 return public_url
             else:
                 logger.error("Public URL 가져오기 실패")
@@ -388,15 +178,7 @@ def check_restaurant_exists(restaurant_id):
 @reviews_bp.route('/users/reviews', methods=['GET'])
 @login_required
 def get_user_reviews(user_id):
-    """사용자가 작성한 리뷰 목록 조회"""
-    # HTTP 메서드 명시적 검증 (보안 강화)
-    if request.method != 'GET':
-        logger.warning(f"허용되지 않은 HTTP 메서드: {request.method}, User ID={user_id}")
-        return jsonify({
-            "success": False,
-            "error": "허용되지 않은 요청 메서드입니다."
-        }), 405
-    
+    """사용자가 작성한 리뷰 목록 조회"""    
     try:
         # 쿼리 파라미터에서 페이지네이션 정보 가져오기
         page = request.args.get('page', default=1, type=int)
@@ -411,9 +193,6 @@ def get_user_reviews(user_id):
         # 오프셋 계산
         offset = (page - 1) * limit
         
-        # IDOR 방지: 본인의 리뷰만 조회 (user_id는 세션에서 가져온 값만 사용)
-        # 쿼리 파라미터에서 user_id를 받지 않음 (보안)
-        
         # 리뷰 목록 조회 (restaurants 정보는 별도로 조회)
         result = supabase.table('reviews') \
             .select('review_id, restaurant_id, content, rating, image_url, created_at, updated_at') \
@@ -421,8 +200,6 @@ def get_user_reviews(user_id):
             .order('created_at', desc=True) \
             .range(offset, offset + limit - 1) \
             .execute()
-        
-        logger.info(f"리뷰 조회 결과: {len(result.data) if result.data else 0}개, User ID={user_id}")
         
         # 전체 개수 조회 (페이지네이션용) - 더 간단한 방식
         try:
@@ -437,12 +214,9 @@ def get_user_reviews(user_id):
             else:
                 total_count = len(result.data) if result.data else 0
         except Exception as e:
-            logger.warning(f"카운트 조회 오류: {str(e)}, 데이터 길이 사용")
             total_count = len(result.data) if result.data else 0
         
         total_pages = (total_count + limit - 1) // limit if limit > 0 else 1
-        
-        logger.info(f"전체 리뷰 개수: {total_count}, 현재 페이지: {page}, 총 페이지: {total_pages}")
         
         # 식당 ID 목록 추출
         restaurant_ids = []
@@ -462,7 +236,10 @@ def get_user_reviews(user_id):
                 if restaurants_result.data:
                     restaurants_map = {r.get('restaurant_id'): r.get('name', '알 수 없음') for r in restaurants_result.data}
             except Exception as e:
-                logger.warning(f"식당 정보 일괄 조회 실패: {str(e)}")
+                return jsonify({
+                    "success": False,
+                    "error": "식당 정보 일괄 조회에 실패했습니다. "
+                }), 500
         
         # 응답 형식 변환
         reviews = []
@@ -507,12 +284,6 @@ def get_user_reviews(user_id):
                         except:
                             updated_at_str = None
                 
-                # 로깅 (디버깅용)
-                if created_at_str:
-                    logger.debug(f"리뷰 {item.get('review_id')} - created_at: {created_at_str}")
-                if updated_at_str:
-                    logger.debug(f"리뷰 {item.get('review_id')} - updated_at: {updated_at_str}")
-                
                 review_data = {
                     "id": item.get('review_id'),
                     "restaurantId": restaurant_id,
@@ -524,9 +295,6 @@ def get_user_reviews(user_id):
                     "updatedAt": updated_at_str
                 }
                 reviews.append(review_data)
-        
-        logger.info(f"변환된 리뷰 개수: {len(reviews)}")
-        
         # 페이지네이션 정보
         pagination = {
             "page": page,
@@ -536,9 +304,7 @@ def get_user_reviews(user_id):
             "hasNext": page < total_pages,
             "hasPrev": page > 1
         }
-        
-        logger.info(f"리뷰 목록 조회 성공: User ID={user_id}, Page={page}, Limit={limit}, Total={total_count}")
-        
+
         return jsonify({
             "success": True,
             "data": {
@@ -554,21 +320,125 @@ def get_user_reviews(user_id):
             "error": "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
         }), 500
 
+#가게의 리뷰 목록을 조회
+@reviews_bp.route('/restaurants/<restaurant_id>/reviews', methods=['GET'])
+def get_restaurant_reviews(restaurant_id):
+    """식당의 리뷰 목록 조회"""    
+    try:
+        # restaurant_id 검증
+        try:
+            restaurant_id_int = int(restaurant_id)
+        except (ValueError, TypeError):
+            logger.error(f"잘못된 restaurant_id 형식: {restaurant_id}")
+            return jsonify({
+                "success": False,
+                "error": "잘못된 식당 ID입니다."
+            }), 400
+        
+        # 식당 존재 확인
+        if not check_restaurant_exists(restaurant_id_int):
+            return jsonify({
+                "success": False,
+                "error": "존재하지 않는 식당입니다."
+            }), 404
+        
+        # 쿼리 파라미터에서 페이지네이션 정보 가져오기
+        page = request.args.get('page', default=1, type=int)
+        limit = request.args.get('limit', default=20, type=int)
+        
+        # 페이지네이션 검증
+        if page < 1:
+            page = 1
+        if limit < 1 or limit > 100:  # 최대 100개로 제한
+            limit = 20
+        
+        # 오프셋 계산
+        offset = (page - 1) * limit
+        
+        # 리뷰 목록 조회
+        result = supabase.table('reviews') \
+            .select('review_id, user_id, content, rating, image_url, created_at, updated_at') \
+            .eq('restaurant_id', restaurant_id_int) \
+            .order('created_at', desc=True) \
+            .range(offset, offset + limit - 1) \
+            .execute()
+        
+        # 전체 개수 조회 (페이지네이션용)
+        try:
+            count_result = supabase.table('reviews') \
+                .select('review_id', count='exact') \
+                .eq('restaurant_id', restaurant_id_int) \
+                .execute()
+            
+            # Supabase count 응답 처리
+            if hasattr(count_result, 'count') and count_result.count is not None:
+                total_count = count_result.count
+            else:
+                total_count = len(result.data) if result.data else 0
+        except Exception as e:
+            total_count = len(result.data) if result.data else 0
+
+        total_pages = (total_count + limit - 1) // limit if limit > 0 else 1
+
+        
+        # 응답 형식 변환
+        reviews = []
+        if result.data:
+            for item in result.data:
+
+                user_id = item.get('user_id')
+
+                result = supabase.table('users') \
+                .select('nickname, profile_image_url') \
+                .eq('user_id', user_id) \
+                .execute()
+
+                user=result.data[0] if result.data else {}
+
+                review_data = {
+                    "id": item.get('review_id'),
+                    "content": item.get('content', ''),
+                    "rating": item.get('rating'),
+                    "createdAt": item.get('created_at'),
+                    "updatedAt": item.get('updated_at'),
+                    "userName" : user.get('nickname') or "익명",
+                    "userProfileImage": user.get('profile_image_url') or "",
+                    "images": item.get('image_url') or ''
+                }
+                reviews.append(review_data)
+
+        # 페이지네이션 정보
+        pagination = {
+            "page": page,
+            "limit": limit,
+            "total": total_count,
+            "totalPages": total_pages,
+            "hasNext": page < total_pages,
+            "hasPrev": page > 1
+        }
+
+        return jsonify({
+            "success": True,
+            "data": {
+                "reviews": reviews,
+                "pagination": pagination
+            }
+        }), 200
+    except Exception as e:
+        logger.error(f"리뷰 목록 조회 중 오류 발생: {type(e).__name__}", exc_info=True)
+        return jsonify({
+            "success": False,
+            "error": "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+        }), 500
+
+
+
 
 @reviews_bp.route('/restaurants/<restaurant_id>/reviews', methods=['POST'])
 @login_required
 def create_review(restaurant_id, user_id):
     """리뷰 작성"""
-    # HTTP 메서드 명시적 검증 (보안 강화)
-    if request.method != 'POST':
-        logger.warning(f"허용되지 않은 HTTP 메서드: {request.method}, User ID={user_id}")
-        return jsonify({
-            "success": False,
-            "error": "허용되지 않은 요청 메서드입니다."
-        }), 405
-    
     try:
-        # restaurant_id 검증
         try:
             restaurant_id_int = int(restaurant_id)
         except (ValueError, TypeError):
@@ -593,11 +463,6 @@ def create_review(restaurant_id, user_id):
                 "error": "요청 데이터가 없습니다."
             }), 400
         
-        # IDOR 방지: 클라이언트에서 보낸 userId, storeId 무시 (세션과 URL에서만 가져옴)
-        if 'userId' in data or 'storeId' in data:
-            logger.warning(f"클라이언트에서 userId/storeId 전송 시도: User ID={user_id}, Data={data.get('userId')}, {data.get('storeId')}")
-            # 경고만 로깅하고 무시 (보안상 안전)
-        
         # 입력 값 추출 및 sanitization
         title = sanitize_input(data.get('title'), max_length=100) if data.get('title') else None
         content = sanitize_input(data.get('content'), max_length=2000) if data.get('content') else None
@@ -610,7 +475,6 @@ def create_review(restaurant_id, user_id):
             if isinstance(image_data, str):
                 # Base64 이미지인 경우 Storage에 업로드
                 if image_data.startswith('data:image/'):
-                    logger.info(f"Base64 이미지 감지, Storage에 업로드 시작: User ID={user_id}")
                     # Base64 검증
                     is_valid, error_msg = validate_base64_image(image_data)
                     if not is_valid:
@@ -679,13 +543,6 @@ def create_review(restaurant_id, user_id):
                 "error": error_msg
             }), 400
         
-        is_valid, error_msg = validate_rating(rating)
-        if not is_valid:
-            return jsonify({
-                "success": False,
-                "error": error_msg
-            }), 400
-        
         if image_url:
             is_valid, error_msg = validate_image_url(image_url)
             if not is_valid:
@@ -739,8 +596,6 @@ def create_review(restaurant_id, user_id):
             "createdAt": review.get('created_at'),
             "updatedAt": review.get('updated_at')
         }
-        
-        logger.info(f"리뷰 작성 성공: Review ID={review.get('review_id')}, User ID={user_id}, Restaurant ID={restaurant_id_int}")
         
         return jsonify({
             "success": True,
@@ -847,11 +702,10 @@ def update_review(review_id, user_id):
         if 'rating' in data:
             rating = data.get('rating')
             if rating is not None:
-                is_valid, error_msg = validate_rating(rating)
-                if not is_valid:
+                if not isinstance(rating, int) or rating < 1 or rating > 5:
                     return jsonify({
                         "success": False,
-                        "error": error_msg
+                        "error": "평점은 1에서 5 사이의 정수여야 합니다."
                     }), 400
                 update_fields['rating'] = int(rating)
         
@@ -906,7 +760,6 @@ def update_review(review_id, user_id):
             "updatedAt": updated_review.get('updated_at')
         }
         
-        logger.info(f"리뷰 수정 성공: Review ID={review_id_int}, User ID={user_id}")
         
         return jsonify({
             "success": True,
@@ -973,8 +826,6 @@ def delete_review(review_id, user_id):
                 "success": False,
                 "error": "리뷰를 찾을 수 없습니다."
             }), 404
-        
-        logger.info(f"리뷰 삭제 성공: Review ID={review_id_int}, User ID={user_id}")
         
         return jsonify({
             "success": True,
